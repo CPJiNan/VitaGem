@@ -15,6 +15,7 @@ taboolib {
             Metrics,
             CommandHelper,
             Bukkit,
+            BukkitUI,
             BukkitHook,
             BukkitUtil,
         )

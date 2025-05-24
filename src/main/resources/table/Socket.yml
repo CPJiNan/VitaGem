@@ -1,0 +1,25 @@
+# 示例镶嵌界面
+Socket:
+  # 界面标题
+  Title: "§6镶嵌界面"
+  # 界面布局
+  Layout:
+    - '#########'
+    - '         '
+    - '         '
+    - '         '
+    - '         '
+    - '########C'
+  # 图标
+  Icon:
+    '#':
+      Type: 'GRAY_STAINED_GLASS_PANE'
+      Data: 7
+      Name: '§8'
+      Lore: [ ]
+    'C':
+      Type: 'GRAY_STAINED_GLASS_PANE'
+      Data: 14
+      Name: '§c关闭菜单'
+      Lore: [ ]
+      Bind: "Close"

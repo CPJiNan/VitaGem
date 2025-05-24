@@ -3,3 +3,6 @@ Plugin-Loading: '&7正在加载 &3Vita&bGem&8&f... &8{0}'
 Plugin-Enabled: '&8[&3Vita&bGem&8] &b信息 &8| &6插件加载完毕.'
 Plugin-Disable: '&8[&3Vita&bGem&8] &b信息 &8| &6插件卸载完毕.'
 Plugin-Reloaded: '&8[&3Vita&bGem&8] &b信息 &8| &6插件重载完毕.'
+
+# 报错相关
+Error-No-Permission: "&c无进行当前操作的权限."
