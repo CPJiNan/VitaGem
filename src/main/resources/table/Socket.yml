@@ -5,11 +5,11 @@ Socket:
   # 界面布局
   Layout:
     - '#########'
-    - '         '
-    - '         '
-    - '         '
-    - '         '
-    - '########C'
+    - '###I#G###'
+    - '#########'
+    - '####S####'
+    - '#########'
+    - '####C####'
   # 图标
   Icon:
     '#':
@@ -17,9 +17,24 @@ Socket:
       Data: 7
       Name: '§8'
       Lore: [ ]
-    'C':
+    'I':
       Type: 'GRAY_STAINED_GLASS_PANE'
-      Data: 14
+      Data: 8
+      Name: '§8'
+      Lore: [ ]
+    'G':
+      Type: 'GRAY_STAINED_GLASS_PANE'
+      Data: 8
+      Name: '§8'
+      Lore: [ ]
+    'S':
+      Type: 'BLAZE_POWDER'
+      Data: 0
+      Name: '§8'
+      Lore: [ ]
+    'C':
+      Type: 'BARRIER'
+      Data: 0
       Name: '§c关闭菜单'
       Lore: [ ]
       Bind: "Close"
