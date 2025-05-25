@@ -3,9 +3,9 @@ package com.github.cpjinan.plugin.vitagem.command
 import com.github.cpjinan.plugin.vitagem.VitaGem
 import com.github.cpjinan.plugin.vitagem.VitaGemSettings
 import com.github.cpjinan.plugin.vitagem.event.PluginReloadEvent
-import org.bukkit.entity.Player
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.*
+import taboolib.common.util.isConsole
 import taboolib.expansion.createHelper
 import taboolib.module.lang.sendLang
 
@@ -35,11 +35,17 @@ object MainCommand {
     val open = subCommand {
         dynamic("table") {
             suggest { VitaGem.api().getService().tableConfigDataMap.keys.toList() }
-            execute<ProxyCommandSender> { sender: ProxyCommandSender, context: CommandContext<ProxyCommandSender>, _: String ->
-                if (sender.hasPermission("vitagem.open.*") || sender.hasPermission("vitagem.open.${context["table"]}")) {
-                    val serviceAPI = VitaGem.api().getService()
-                    sender.castSafely<Player>()?.let { serviceAPI.openGUI(it, context["table"]) }
-                } else sender.sendLang("Error-No-Permission")
+            execute<ProxyCommandSender> { sender, context, _ ->
+                if (sender.isConsole()) {
+                    sender.sendLang("Error-Not-Player")
+                    return@execute
+                }
+
+                if (!sender.hasPermission("vitagem.open.*") && !sender.hasPermission("vitagem.open.${context["table"]}")) {
+                    sender.sendLang("Error-No-Permission")
+                }
+
+                VitaGem.api().getService().openGUI(sender.cast(), context["table"])
             }
         }
     }

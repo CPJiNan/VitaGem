@@ -6,3 +6,5 @@ Plugin-Reloaded: '&8[&3Vita&bGem&8] &b信息 &8| &6插件重载完毕.'
 
 # 报错相关
 Error-No-Permission: "&c无进行当前操作的权限."
+Error-Not-Player: "&c控制台不能执行此操作."
+Error-Air-In-Hand: "&c手中物品为空气."
