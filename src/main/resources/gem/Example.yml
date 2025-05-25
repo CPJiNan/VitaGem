@@ -1,0 +1,91 @@
+# 示例宝石配置
+Example:
+  # 宝石物品匹配规则 (Arim)
+  Item: "name:&a一阶生命宝石"
+  # 限制镶嵌/拆卸界面 (留空则不指定界面)
+  Table:
+    Socket: ""
+    Extract: ""
+  # 镶嵌槽位 Lore
+  Slot: "§7「§f生命宝石槽位§7」"
+  # 成功镶嵌宝石后的槽位 Lore
+  Display: "§7「§a生命宝石·一阶§7」"
+  # 成功镶嵌后为物品新增的属性 Lore
+  Attribute:
+    - "§6⏏ §f生命力: §a+10"
+  # 镶嵌相关设置
+  Socket:
+    # 成功率
+    Chance: 0.9
+    # 条件
+    Condition:
+      # 脚本 (需每行均返回 true)
+      Kether: [ ]
+    # 费用
+    Cost:
+      # Vault 金钱
+      # 格式: "数值 权重"
+      # 使用 "最小值~最大值" 获取范围内随机数值
+      Money:
+        - "-200~-100 25"
+        - "-500 20~25"
+        - "-1000 75"
+      # PlayerPoints 点券
+      Point: [ ]
+    # 返还
+    Return:
+      Success:
+        # 镶嵌成功返还物品
+        Item: true
+        # 镶嵌成功返还宝石
+        Gem: false
+        # 镶嵌成功返还金钱
+        Money: false
+        # 镶嵌成功返还点券
+        Point: false
+      Fail:
+        # 镶嵌失败返还物品
+        Item: true
+        # 镶嵌失败返还宝石
+        Gem: false
+        # 镶嵌失败返还金钱
+        Money: false
+        # 镶嵌失败返还点券
+        Point: false
+  # 拆卸相关设置
+  Extract:
+    # 成功率
+    Chance: 0.3
+    # 条件
+    Condition:
+      # 脚本 (需每行均返回 true)
+      Kether: [ ]
+    # 费用
+    Cost:
+      # Vault 金钱
+      Money:
+        - "-200~-100 25"
+        - "-500 20~25"
+        - "-1000 75"
+      # PlayerPoints 点券
+      Point: [ ]
+    # 返还
+    Return:
+      Success:
+        # 拆卸成功返还物品
+        Item: true
+        # 拆卸成功返还宝石
+        Gem: true
+        # 拆卸成功返还金钱
+        Money: false
+        # 拆卸成功返还点券
+        Point: false
+      Fail:
+        # 拆卸失败返还物品
+        Item: true
+        # 拆卸失败返还宝石
+        Gem: false
+        # 拆卸失败返还金钱
+        Money: false
+        # 拆卸失败返还点券
+        Point: false
