@@ -16,7 +16,7 @@ Example:
   # 镶嵌相关设置
   Socket:
     # 成功率
-    Chance: 0.9
+    Chance: "0.9"
     # 条件
     Condition:
       # 脚本 (需每行均返回 true)
@@ -55,7 +55,7 @@ Example:
   # 拆卸相关设置
   Extract:
     # 成功率
-    Chance: 0.3
+    Chance: "0.3"
     # 条件
     Condition:
       # 脚本 (需每行均返回 true)
