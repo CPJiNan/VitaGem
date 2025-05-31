@@ -151,8 +151,16 @@ object DefaultInventory {
         gemSlot: Int
     ): Map<String, Any> {
         var resultMap = hashMapOf<String, Any>("Result" to false)
-        val item = inv.getItem(itemSlot) ?: return resultMap
-        val gemItem = inv.getItem(gemSlot) ?: return resultMap
+        val item = inv.getItem(itemSlot)
+        if (item == null) {
+            resultMap["Item"] = false
+            return resultMap
+        }
+        val gemItem = inv.getItem(gemSlot)
+        if (gemItem == null) {
+            resultMap["Gem"] = false
+            return resultMap
+        }
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
 
@@ -165,6 +173,8 @@ object DefaultInventory {
         resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>
         val result = (resultMap["Result"] ?: "false").toString().toBoolean()
         val enableResult = (resultMap["Enable"] ?: "true").toString().toBoolean()
+        val itemResult = (resultMap["Item"] ?: "true").toString().toBoolean()
+        val gemResult = (resultMap["Gem"] ?: "true").toString().toBoolean()
         val slotResult = (resultMap["Slot"] ?: "true").toString().toBoolean()
         val tableResult = (resultMap["Table"] ?: "true").toString().toBoolean()
         val ketherResult = (resultMap["Kether"] ?: "true").toString().toBoolean()
@@ -185,7 +195,7 @@ object DefaultInventory {
                     for ((index, element) in this.withIndex()) {
                         if (element == gemConfig.slot) {
                             set(index, gemConfig.display)
-                            addAll(index, gemConfig.attribute)
+                            addAll(index + 1, gemConfig.attribute)
                             break
                         }
                     }
@@ -212,6 +222,8 @@ object DefaultInventory {
             }
         } else {
             if (!enableResult) player.sendLang("Socket-Disable")
+            if (!itemResult) player.sendLang("Socket-No-Item")
+            if (!gemResult) player.sendLang("Socket-No-Gem")
             if (!slotResult) player.sendLang("Socket-No-Slot")
             if (!tableResult) player.sendLang("Socket-Table-Not-Match")
             if (!ketherResult) player.sendLang("Error-Condition-Not-Met")
