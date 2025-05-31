@@ -110,9 +110,9 @@ object DefaultVitaGemService : VitaGemService {
 
     /** 获取物品镶嵌槽位数量 **/
     override fun getSlot(item: ItemStack, data: GemConfigData): Int {
-        return item.itemMeta.lore.count {
+        return item.itemMeta?.lore?.count {
             it.contains(data.slot)
-        }
+        } ?: 0
     }
 
     /** 获取宝石槽位列表 **/
@@ -129,9 +129,9 @@ object DefaultVitaGemService : VitaGemService {
 
     /** 获取物品宝石槽位数量 **/
     override fun getDisplay(item: ItemStack, data: GemConfigData): Int {
-        return item.itemMeta.lore.count {
+        return item.itemMeta?.lore?.count {
             it.contains(data.display)
-        }
+        } ?: 0
     }
 
     /** 是否满足镶嵌条件 **/
@@ -146,26 +146,27 @@ object DefaultVitaGemService : VitaGemService {
 
         if (!section.getBoolean("Enable")) {
             map["Result"] = false
-            map["Enable"] = true
+            map["Enable"] = false
             return map
         }
 
         if (getSlot(item, data) == 0) {
             map["Result"] = false
-            map["Slot"] = true
+            map["Slot"] = false
             return map
         }
 
-        val tableList = section.getStringList("Condition.Table")
-        if (tableList.isNotEmpty() && table !in tableList) {
+        val tableCondition = section.getString("Condition.Table", "")!!
+        if (tableCondition.isNotEmpty() && table != tableCondition) {
             map["Result"] = false
-            map["Table"] = true
+            map["Table"] = false
             return map
         }
 
-        if (!section.getStringList("Condition.Kether").all { it.evalKether(player).toString().toBoolean() }) {
+        val ketherCondition = section.getStringList("Condition.Kether")
+        if (!ketherCondition.all { it.evalKether(player).toString().toBoolean() }) {
             map["Result"] = false
-            map["Kether"] = true
+            map["Kether"] = false
             return map
         }
 
@@ -176,8 +177,8 @@ object DefaultVitaGemService : VitaGemService {
             !hookAPI.getVault().isMoneyEnough(player, money)
         ) {
             map["Result"] = false
-            map["Money"] = true
-            map["MoneyAmount"] = money
+            map["Money_Enough"] = false
+            map["Money_Amount"] = money
         }
 
         val point = section.getInt("Point")
@@ -185,8 +186,8 @@ object DefaultVitaGemService : VitaGemService {
             !hookAPI.getPlayerPoints().isPointEnough(player, point)
         ) {
             map["Result"] = false
-            map["Point"] = true
-            map["PointAmount"] = point
+            map["Point_Enough"] = false
+            map["Point_Amount"] = point
         }
 
         return map
