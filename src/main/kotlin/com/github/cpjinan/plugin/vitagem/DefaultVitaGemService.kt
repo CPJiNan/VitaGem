@@ -144,7 +144,7 @@ object DefaultVitaGemService : VitaGemService {
         val section = data.socketSection
         val map = hashMapOf<String, Any>("Result" to true)
 
-        if (!section.getBoolean("Enable")) {
+        if (!section.getBoolean("Enable", false)) {
             map["Result"] = false
             map["Enable"] = false
             return map
@@ -172,7 +172,7 @@ object DefaultVitaGemService : VitaGemService {
 
         val hookAPI = VitaGem.api().getHook()
 
-        val money = section.getDouble("Money")
+        val money = section.getDouble("Money", 0.0)
         if (hookAPI.getVault().isPluginEnabled() &&
             !hookAPI.getVault().isMoneyEnough(player, money)
         ) {
@@ -181,7 +181,66 @@ object DefaultVitaGemService : VitaGemService {
             map["Money_Amount"] = money
         }
 
-        val point = section.getInt("Point")
+        val point = section.getInt("Point", 0)
+        if (hookAPI.getPlayerPoints().isPluginEnabled() &&
+            !hookAPI.getPlayerPoints().isPointEnough(player, point)
+        ) {
+            map["Result"] = false
+            map["Point_Enough"] = false
+            map["Point_Amount"] = point
+        }
+
+        return map
+    }
+
+    /** 是否满足拆卸条件 **/
+    override fun isExtractConditionMet(
+        player: Player,
+        item: ItemStack,
+        data: GemConfigData,
+        table: String
+    ): Map<String, Any> {
+        val section = data.extractSection
+        val map = hashMapOf<String, Any>("Result" to true)
+
+        if (!section.getBoolean("Enable", false)) {
+            map["Result"] = false
+            map["Enable"] = false
+            return map
+        }
+
+        if (getDisplay(item, data) == 0) {
+            map["Result"] = false
+            map["Display"] = false
+            return map
+        }
+
+        val tableCondition = section.getString("Condition.Table", "")!!
+        if (tableCondition.isNotEmpty() && table != tableCondition) {
+            map["Result"] = false
+            map["Table"] = false
+            return map
+        }
+
+        val ketherCondition = section.getStringList("Condition.Kether")
+        if (!ketherCondition.all { it.evalKether(player).toString().toBoolean() }) {
+            map["Result"] = false
+            map["Kether"] = false
+            return map
+        }
+
+        val hookAPI = VitaGem.api().getHook()
+
+        val money = section.getDouble("Money", 0.0)
+        if (hookAPI.getVault().isPluginEnabled() &&
+            !hookAPI.getVault().isMoneyEnough(player, money)
+        ) {
+            map["Result"] = false
+            map["Money_Enough"] = false
+            map["Money_Amount"] = money
+        }
+
+        val point = section.getInt("Point", 0)
         if (hookAPI.getPlayerPoints().isPluginEnabled() &&
             !hookAPI.getPlayerPoints().isPointEnough(player, point)
         ) {

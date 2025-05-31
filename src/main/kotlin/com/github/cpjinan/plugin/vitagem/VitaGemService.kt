@@ -48,4 +48,7 @@ interface VitaGemService {
 
     /** 是否满足镶嵌条件 **/
     fun isSocketConditionMet(player: Player, item: ItemStack, data: GemConfigData, table: String): Map<String, Any>
+
+    /** 是否满足拆卸条件 **/
+    fun isExtractConditionMet(player: Player, item: ItemStack, data: GemConfigData, table: String): Map<String, Any>
 }
