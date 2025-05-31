@@ -2,6 +2,7 @@ package com.github.cpjinan.plugin.vitagem.command
 
 import com.github.cpjinan.plugin.vitagem.VitaGem
 import com.github.cpjinan.plugin.vitagem.VitaGemSettings
+import com.github.cpjinan.plugin.vitagem.command.subcommand.APICommand
 import com.github.cpjinan.plugin.vitagem.event.PluginReloadEvent
 import com.github.cpjinan.plugin.vitagem.utils.LoggerUtils.debug
 import taboolib.common.platform.ProxyCommandSender
@@ -50,6 +51,13 @@ object MainCommand {
             }
         }
     }
+
+    @CommandBody(
+        permission = "VitaGem.command.api.use",
+        permissionDefault = PermissionDefault.OP,
+        hidden = true
+    )
+    val api = APICommand.api
 
     @CommandBody(
         permission = "VitaGem.command.reload.use",
