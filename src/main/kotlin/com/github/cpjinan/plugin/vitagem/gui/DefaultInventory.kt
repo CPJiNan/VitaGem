@@ -158,7 +158,7 @@ object DefaultInventory {
 
         val gemConfig = serviceAPI.getGem(gemItem).filter {
             val gemTable = it.section.getString("Condition.Table", "")!!
-            gemTable.isNotEmpty() || table == gemTable
+            gemTable.isEmpty() || table == gemTable
         }[0]
         val section = gemConfig.socketSection
 
