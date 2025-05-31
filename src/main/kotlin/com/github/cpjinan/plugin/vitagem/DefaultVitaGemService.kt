@@ -111,7 +111,7 @@ object DefaultVitaGemService : VitaGemService {
     /** 获取物品镶嵌槽位数量 **/
     override fun getSlot(item: ItemStack, data: GemConfigData): Int {
         return item.itemMeta?.lore?.count {
-            it.contains(data.slot)
+            it == data.slot
         } ?: 0
     }
 
@@ -130,7 +130,7 @@ object DefaultVitaGemService : VitaGemService {
     /** 获取物品宝石槽位数量 **/
     override fun getDisplay(item: ItemStack, data: GemConfigData): Int {
         return item.itemMeta?.lore?.count {
-            it.contains(data.display)
+            it == data.display
         } ?: 0
     }
 

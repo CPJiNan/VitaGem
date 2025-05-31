@@ -12,6 +12,7 @@ import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Chest
 import taboolib.platform.compat.replacePlaceholder
 import taboolib.platform.util.buildItem
+import taboolib.platform.util.modifyLore
 import taboolib.platform.util.sendLang
 import top.maplex.arim.Arim
 
@@ -179,6 +180,16 @@ object DefaultInventory {
                 resultMap["Chance.Amount"] = chance
 
                 player.sendLang("Socket-Success")
+
+                item.modifyLore {
+                    for ((index, element) in this.withIndex()) {
+                        if (element == gemConfig.slot) {
+                            set(index, gemConfig.display)
+                            addAll(index, gemConfig.attribute)
+                            break
+                        }
+                    }
+                }
 
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)

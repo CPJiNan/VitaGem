@@ -23,6 +23,11 @@ taboolib {
     }
     description {
         contributors { name("CPJiNan") }
+        dependencies {
+            name("Vault").optional(true)
+            name("PlayerPoints").optional(true)
+            name("ItemTools").optional(true)
+        }
     }
     version { taboolib = "6.2.3-8cc2f66" }
     relocate("top.maplex.arim", "com.github.cpjinan.plugin.vitagem.arim")
