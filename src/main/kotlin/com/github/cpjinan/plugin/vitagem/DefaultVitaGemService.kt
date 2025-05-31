@@ -96,38 +96,38 @@ object DefaultVitaGemService : VitaGemService {
         return Arim.itemMatch.match(item, data.item)
     }
 
-    /** 获取所有镶嵌槽位 **/
+    /** 获取镶嵌槽位列表 **/
     override fun getSlot(): List<String> {
         return gemConfigDataMap.values.map { it.slot }
     }
 
-    /** 物品的所有镶嵌槽位数量 **/
+    /** 获取物品镶嵌槽位数量 **/
     override fun getSlot(item: ItemStack): Map<GemConfigData, Int> {
         return gemConfigDataMap.values.associateWith {
             getSlot(item, it)
         }
     }
 
-    /** 物品的指定镶嵌槽位数量 **/
+    /** 获取物品镶嵌槽位数量 **/
     override fun getSlot(item: ItemStack, data: GemConfigData): Int {
         return item.itemMeta.lore.count {
             it.contains(data.slot)
         }
     }
 
-    /** 获取所有宝石槽位 **/
+    /** 获取宝石槽位列表 **/
     override fun getDisplay(): List<String> {
         return gemConfigDataMap.values.map { it.display }
     }
 
-    /** 物品的所有宝石槽位数量 **/
+    /** 获取物品宝石槽位数量 **/
     override fun getDisplay(item: ItemStack): Map<GemConfigData, Int> {
         return gemConfigDataMap.values.associateWith {
             getDisplay(item, it)
         }
     }
 
-    /** 物品的指定宝石槽位数量 **/
+    /** 获取物品宝石槽位数量 **/
     override fun getDisplay(item: ItemStack, data: GemConfigData): Int {
         return item.itemMeta.lore.count {
             it.contains(data.display)

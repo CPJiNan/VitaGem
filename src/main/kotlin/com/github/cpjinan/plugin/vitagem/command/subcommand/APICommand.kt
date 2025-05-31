@@ -49,25 +49,25 @@ object APICommand {
                     sender.sendMessage(serviceAPI.getGem(sender.cast<Player>().itemInHand).toString())
                 }
             }
-            // 获取所有镶嵌槽位
+            // 获取镶嵌槽位列表
             literal("getSlot") {
                 execute<ProxyCommandSender> { sender, _, _ ->
                     sender.sendMessage(serviceAPI.getSlot().toString())
                 }
             }
-            // 物品的所有镶嵌槽位数量
+            // 获取物品镶嵌槽位数量
             literal("getItemSlot") {
                 execute<ProxyCommandSender> { sender, _, _ ->
                     sender.sendMessage(serviceAPI.getSlot(sender.cast<Player>().itemInHand).toString())
                 }
             }
-            // 获取所有宝石槽位
+            // 获取宝石槽位列表
             literal("getDisplay") {
                 execute<ProxyCommandSender> { sender, _, _ ->
                     sender.sendMessage(serviceAPI.getDisplay().toString())
                 }
             }
-            // 物品的所有宝石槽位数量
+            // 获取物品宝石槽位数量
             literal("getItemDisplay") {
                 execute<ProxyCommandSender> { sender, _, _ ->
                     sender.sendMessage(serviceAPI.getDisplay(sender.cast<Player>().itemInHand).toString())
