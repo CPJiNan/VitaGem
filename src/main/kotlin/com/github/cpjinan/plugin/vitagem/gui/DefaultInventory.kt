@@ -1,10 +1,12 @@
 package com.github.cpjinan.plugin.vitagem.gui
 
 import com.github.cpjinan.plugin.vitagem.VitaGem
+import com.github.cpjinan.plugin.vitagem.utils.KetherUtils.evalKether
 import com.github.cpjinan.plugin.vitagem.utils.RandomUtils
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
+import taboolib.common5.util.replace
 import taboolib.library.xseries.XMaterial
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Chest
@@ -64,24 +66,71 @@ object DefaultInventory {
                 }
 
                 when (section.getString("Bind")) {
+                    // 镶嵌宝石
+                    "Socket", "VitaGem:Socket" -> {
+                        set(icon[0], item) {
+                            clickEvent().isCancelled = true
+                            clickEvent().run {
+                                val result = socketButton(
+                                    player,
+                                    table,
+                                    player.openInventory.topInventory,
+                                    getSlots(tableOptions["Socket.Symbol.Item"]!![0])[0],
+                                    getSlots(tableOptions["Socket.Symbol.Gem"]!![0])[0]
+                                )
+                                section.getStringList("Kether")
+                                    .replace(
+                                        "%Result%" to (result["Result"] ?: "false"),
+                                        "%Enable%" to (result["Enable"] ?: "true"),
+                                        "%Slot%" to (result["Slot"] ?: "true"),
+                                        "%Table%" to (result["Table"] ?: "true"),
+                                        "%Kether%" to (result["Kether"] ?: "true"),
+                                        "%Chance.Result%" to (result["Chance.Result"] ?: "true"),
+                                        "%Chance.Amount%" to (result["Chance.Amount"] ?: "1.0"),
+                                        "%Money.Enough%" to (result["Money.Enough"] ?: "true"),
+                                        "%Money.Amount%" to (result["Money.Amount"] ?: "0.0"),
+                                        "%Point.Enough%" to (result["Point.Enough"] ?: "true"),
+                                        "%Point.Amount%" to (result["Point.Amount"] ?: "0")
+                                    )
+                                    .evalKether(player)
+                            }
+                        }
+                    }
+
                     // 关闭界面
                     "Close", "VitaGem:Close" -> {
                         set(icon[0], item) {
                             clickEvent().isCancelled = true
-                            player.closeInventory()
+                            clickEvent().run {
+                                player.closeInventory()
+                                section.getStringList("Kether").evalKether(player)
+                            }
                         }
                     }
 
                     else -> {
                         set(icon[0], item) {
                             clickEvent().isCancelled = true
+                            clickEvent().run {
+                                section.getStringList("Kether").evalKether(player)
+                            }
                         }
                     }
                 }
             }
 
             onClose { event: InventoryCloseEvent ->
-                getSlots(' ').forEach { slot ->
+                when (tableType) {
+                    "Socket" -> {
+                        mutableListOf<Int>().apply {
+                            addAll(getSlots(tableOptions["Socket.Symbol.Item"]!![0]))
+                            addAll(getSlots(tableOptions["Socket.Symbol.Gem"]!![0]))
+                            addAll(getSlots(' '))
+                        }
+                    }
+
+                    else -> mutableListOf()
+                }.forEach { slot ->
                     val item = event.inventory.getItem(slot)
                     if (item != null) {
                         player.inventory.addItem(item).values.forEach {
