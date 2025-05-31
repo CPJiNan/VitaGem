@@ -1,7 +1,7 @@
 # 示例宝石配置
 Example:
   # 宝石物品匹配规则 (Arim)
-  Item: "name:&a一阶生命宝石"
+  Item: "name:&a一阶生命宝石;amount:=1"
   # 镶嵌槽位 Lore
   Slot: "§7「§f生命宝石槽位§7」"
   # 成功镶嵌宝石后的槽位 Lore

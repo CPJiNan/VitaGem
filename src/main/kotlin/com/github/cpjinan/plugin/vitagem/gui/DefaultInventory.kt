@@ -85,6 +85,9 @@ object DefaultInventory {
                                     .replace(
                                         "%Result%" to (result["Result"] ?: "false"),
                                         "%Enable%" to (result["Enable"] ?: "true"),
+                                        "%Item%" to (result["Item"] ?: "true"),
+                                        "%Gem%" to (result["Gem"] ?: "true"),
+                                        "%Match%" to (result["Match"] ?: "true"),
                                         "%Slot%" to (result["Slot"] ?: "true"),
                                         "%Table%" to (result["Table"] ?: "true"),
                                         "%Kether%" to (result["Kether"] ?: "true"),
@@ -168,10 +171,16 @@ object DefaultInventory {
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
 
-        val gemConfig = serviceAPI.getGem(gemItem).filter {
+        val gemConfigList = serviceAPI.getGem(gemItem).filter {
             val gemTable = it.section.getString("Condition.Table", "")!!
             gemTable.isEmpty() || table == gemTable
-        }[0]
+        }
+        if (gemConfigList.isEmpty()) {
+            resultMap["Match"] = false
+            player.sendLang("Socket-Not-Match")
+            return resultMap
+        }
+        val gemConfig = gemConfigList[0]
         val section = gemConfig.socketSection
 
         resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>
