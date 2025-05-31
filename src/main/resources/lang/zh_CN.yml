@@ -8,3 +8,11 @@ Plugin-Reloaded: '&8[&3Vita&bGem&8] &b信息 &8| &6插件重载完毕.'
 Error-No-Permission: "&c无进行当前操作的权限."
 Error-Not-Player: "&c控制台不能执行此操作."
 Error-Air-In-Hand: "&c手中物品为空气."
+Error-Condition-Not-Met: "&c尚未满足执行该操作所需条件."
+Error-Money-Not-Enough: "&c金币不足.执行该操作需要 {0} 金币."
+Error-Point-Not-Enough: "&c点券不足.执行该操作需要 {0} 点券."
+
+# 镶嵌相关
+Socket-Not-Enable: "&c未启用该宝石的镶嵌功能."
+Socket-No-Slot: "&c当前物品无可镶嵌槽位."
+Socket-Table-Not-Match: "&c无法在当前界面镶嵌此宝石."
