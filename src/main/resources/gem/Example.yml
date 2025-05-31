@@ -2,10 +2,6 @@
 Example:
   # 宝石物品匹配规则 (Arim)
   Item: "name:&a一阶生命宝石"
-  # 限制镶嵌/拆卸界面 (留空则不指定界面)
-  Table:
-    Socket: ""
-    Extract: ""
   # 镶嵌槽位 Lore
   Slot: "§7「§f生命宝石槽位§7」"
   # 成功镶嵌宝石后的槽位 Lore
@@ -15,10 +11,14 @@ Example:
     - "§6⏏ §f生命力: §a+10"
   # 镶嵌相关设置
   Socket:
+    # 是否开启
+    Enable: true
     # 成功率
     Chance: "0.9"
     # 条件
     Condition:
+      # 限制镶嵌界面 (留空则不指定界面)
+      Table: ""
       # 脚本 (需每行均返回 true)
       Kether: [ ]
     # 费用
@@ -54,10 +54,14 @@ Example:
         Point: false
   # 拆卸相关设置
   Extract:
+    # 是否开启
+    Enable: true
     # 成功率
     Chance: "0.3"
     # 条件
     Condition:
+      # 限制拆卸界面 (留空则不指定界面)
+      Table: ""
       # 脚本 (需每行均返回 true)
       Kether: [ ]
     # 费用

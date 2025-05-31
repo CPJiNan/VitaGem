@@ -1,6 +1,7 @@
 package com.github.cpjinan.plugin.vitagem
 
 import com.github.cpjinan.plugin.vitagem.VitaGem.plugin
+import com.github.cpjinan.plugin.vitagem.data.GemConfigData
 import com.github.cpjinan.plugin.vitagem.data.TableConfigData
 import com.github.cpjinan.plugin.vitagem.utils.FileUtils.releaseResource
 import org.bukkit.entity.Player
@@ -24,6 +25,7 @@ import java.io.File
  * @since 2025/5/25 00:40
  */
 object DefaultVitaGemService : VitaGemService {
+    override val gemConfigDataMap: HashMap<String, GemConfigData> = hashMapOf()
     override val tableConfigDataMap: HashMap<String, TableConfigData> = hashMapOf()
 
     init {
@@ -32,6 +34,29 @@ object DefaultVitaGemService : VitaGemService {
 
     /** 重载业务配置 **/
     override fun reload() {
+        gemConfigDataMap.clear()
+        readFolderWalkConfig(File("./plugins/VitaGem/gem")) {
+            setReadType(Type.YAML)
+            walk {
+                getKeys(false).forEach { id ->
+                    val slot = getString("$id.Slot") ?: ""
+                    val display = getString("$id.Display") ?: ""
+                    val attribute = getStringList("$id.Attribute")
+                    val socketSection = getConfigurationSection("$id.Socket")!!
+                    val extractSection = getConfigurationSection("$id.Extract")!!
+                    val section = getConfigurationSection(id)!!
+                    gemConfigDataMap[id] = GemConfigData(
+                        id = id,
+                        slot = slot,
+                        display = display,
+                        attribute = attribute,
+                        socketSection = socketSection,
+                        extractSection = extractSection,
+                        section = section
+                    )
+                }
+            }
+        }
         tableConfigDataMap.clear()
         readFolderWalkConfig(File("./plugins/VitaGem/table")) {
             setReadType(Type.YAML)

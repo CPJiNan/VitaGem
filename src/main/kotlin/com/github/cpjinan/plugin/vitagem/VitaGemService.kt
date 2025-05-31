@@ -1,5 +1,6 @@
 package com.github.cpjinan.plugin.vitagem
 
+import com.github.cpjinan.plugin.vitagem.data.GemConfigData
 import com.github.cpjinan.plugin.vitagem.data.TableConfigData
 import org.bukkit.entity.Player
 
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player
  * @since 2025/5/24 13:14
  */
 interface VitaGemService {
+    val gemConfigDataMap: HashMap<String, GemConfigData>
     val tableConfigDataMap: HashMap<String, TableConfigData>
 
     /** 重载业务配置 **/
