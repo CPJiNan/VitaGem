@@ -3,6 +3,7 @@ package com.github.cpjinan.plugin.vitagem.gui
 import com.github.cpjinan.plugin.vitagem.VitaGem
 import com.github.cpjinan.plugin.vitagem.utils.KetherUtils.evalKether
 import com.github.cpjinan.plugin.vitagem.utils.RandomUtils
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
@@ -12,6 +13,7 @@ import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Chest
 import taboolib.platform.compat.replacePlaceholder
 import taboolib.platform.util.buildItem
+import taboolib.platform.util.isAir
 import taboolib.platform.util.modifyLore
 import taboolib.platform.util.sendLang
 import top.maplex.arim.Arim
@@ -152,12 +154,12 @@ object DefaultInventory {
     ): Map<String, Any> {
         var resultMap = hashMapOf<String, Any>("Result" to false)
         val item = inv.getItem(itemSlot)
-        if (item == null) {
+        if (item == null || item.isAir || item.type == Material.AIR) {
             resultMap["Item"] = false
             return resultMap
         }
         val gemItem = inv.getItem(gemSlot)
-        if (gemItem == null) {
+        if (gemItem == null || item.isAir || item.type == Material.AIR) {
             resultMap["Gem"] = false
             return resultMap
         }
