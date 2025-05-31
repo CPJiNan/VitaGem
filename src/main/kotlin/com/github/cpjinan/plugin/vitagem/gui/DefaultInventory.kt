@@ -177,7 +177,7 @@ object DefaultInventory {
         }
         if (gemConfigList.isEmpty()) {
             resultMap["Match"] = false
-            player.sendLang("Socket-Not-Match")
+            player.sendLang("Socket-Gem-Not-Match")
             return resultMap
         }
         val gemConfig = gemConfigList[0]
