@@ -24,16 +24,6 @@ Socket:
       Data: 7
       Name: '§8'
       Lore: [ ]
-    'I':
-      Type: 'GRAY_STAINED_GLASS_PANE'
-      Data: 8
-      Name: '§8'
-      Lore: [ ]
-    'G':
-      Type: 'GRAY_STAINED_GLASS_PANE'
-      Data: 8
-      Name: '§8'
-      Lore: [ ]
     'S':
       Type: 'BLAZE_POWDER'
       Data: 0

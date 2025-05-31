@@ -125,7 +125,6 @@ object DefaultInventory {
                         mutableListOf<Int>().apply {
                             addAll(getSlots(tableOptions["Socket.Symbol.Item"]!![0]))
                             addAll(getSlots(tableOptions["Socket.Symbol.Gem"]!![0]))
-                            addAll(getSlots(' '))
                         }
                     }
 
