@@ -27,8 +27,9 @@ Socket:
     'S':
       Type: 'BLAZE_POWDER'
       Data: 0
-      Name: '§8'
+      Name: '§e点击镶嵌'
       Lore: [ ]
+      Bind: "Socket"
     'C':
       Type: 'BARRIER'
       Data: 0
