@@ -6,10 +6,12 @@ import com.github.cpjinan.plugin.vitagem.data.TableConfigData
 import com.github.cpjinan.plugin.vitagem.gui.DefaultInventory
 import com.github.cpjinan.plugin.vitagem.utils.FileUtils.releaseResource
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.PlatformFactory
 import taboolib.module.configuration.Type
+import top.maplex.arim.Arim
 import top.maplex.arim.tools.folderreader.readFolderWalkConfig
 import java.io.File
 
@@ -35,14 +37,16 @@ object DefaultVitaGemService : VitaGemService {
             setReadType(Type.YAML)
             walk {
                 getKeys(false).forEach { id ->
-                    val slot = getString("$id.Slot") ?: ""
-                    val display = getString("$id.Display") ?: ""
+                    val item = getString("$id.Item") ?: ""
+                    val slot = getString("$id.Slot") ?: "「」"
+                    val display = getString("$id.Display") ?: "「」"
                     val attribute = getStringList("$id.Attribute")
                     val socketSection = getConfigurationSection("$id.Socket")!!
                     val extractSection = getConfigurationSection("$id.Extract")!!
                     val section = getConfigurationSection(id)!!
                     gemConfigDataMap[id] = GemConfigData(
                         id = id,
+                        item = item,
                         slot = slot,
                         display = display,
                         attribute = attribute,
@@ -77,6 +81,18 @@ object DefaultVitaGemService : VitaGemService {
     /** 打开界面 **/
     override fun openGUI(player: Player, table: String) {
         DefaultInventory.openGUI(player, table)
+    }
+
+    /** 获取宝石配置 **/
+    override fun getGemData(item: ItemStack): List<GemConfigData> {
+        return gemConfigDataMap.values.filter { gemConfigData ->
+            isItemGem(item, gemConfigData)
+        }
+    }
+
+    /** 物品是否为宝石 **/
+    override fun isItemGem(item: ItemStack, data: GemConfigData): Boolean {
+        return Arim.itemMatch.match(item, data.item)
     }
 
     @Awake(LifeCycle.CONST)

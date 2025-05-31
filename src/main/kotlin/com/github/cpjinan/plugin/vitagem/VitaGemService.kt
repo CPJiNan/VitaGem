@@ -3,6 +3,7 @@ package com.github.cpjinan.plugin.vitagem
 import com.github.cpjinan.plugin.vitagem.data.GemConfigData
 import com.github.cpjinan.plugin.vitagem.data.TableConfigData
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 /**
  * VitaGem
@@ -20,4 +21,10 @@ interface VitaGemService {
 
     /** 打开界面 **/
     fun openGUI(player: Player, table: String)
+
+    /** 获取宝石配置 **/
+    fun getGemData(item: ItemStack): List<GemConfigData>
+
+    /** 物品是否为宝石 **/
+    fun isItemGem(item: ItemStack, data: GemConfigData): Boolean
 }

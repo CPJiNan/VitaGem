@@ -11,6 +11,7 @@ import taboolib.library.configuration.ConfigurationSection
  */
 data class GemConfigData(
     val id: String,
+    val item: String,
     val slot: String,
     val display: String,
     val attribute: List<String>,
