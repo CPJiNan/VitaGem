@@ -1,14 +1,17 @@
 package com.github.cpjinan.plugin.vitagem.gui
 
 import com.github.cpjinan.plugin.vitagem.VitaGem
+import com.github.cpjinan.plugin.vitagem.utils.RandomUtils
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import taboolib.library.xseries.XMaterial
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Chest
+import taboolib.platform.compat.replacePlaceholder
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.sendLang
+import top.maplex.arim.Arim
 
 /**
  * VitaGem
@@ -97,9 +100,10 @@ object DefaultInventory {
         inv: Inventory,
         itemSlot: Int,
         gemSlot: Int
-    ) {
-        val item = inv.getItem(itemSlot) ?: return
-        val gemItem = inv.getItem(gemSlot) ?: return
+    ): Map<String, Any> {
+        var resultMap = hashMapOf<String, Any>("Result" to false)
+        val item = inv.getItem(itemSlot) ?: return resultMap
+        val gemItem = inv.getItem(gemSlot) ?: return resultMap
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
 
@@ -107,8 +111,9 @@ object DefaultInventory {
             val gemTable = it.section.getString("Condition.Table", "")!!
             gemTable.isNotEmpty() || table == gemTable
         }[0]
+        val section = gemConfig.socketSection
 
-        val resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table)
+        resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>
         val result = (resultMap["Result"] ?: "false").toString().toBoolean()
         val enableResult = (resultMap["Enable"] ?: "true").toString().toBoolean()
         val slotResult = (resultMap["Slot"] ?: "true").toString().toBoolean()
@@ -120,9 +125,34 @@ object DefaultInventory {
         val pointAmountResult = (resultMap["Point.Amount"] ?: "0").toString().toInt()
 
         if (result) {
+            val chance = Arim.fixedCalculator.evaluate(section.getString("Chance", "1.0")!!.replacePlaceholder(player))
+            if (RandomUtils.randomBoolean(chance)) {
+                resultMap["Chance.Result"] = true
+                resultMap["Chance.Amount"] = chance
 
+                player.sendLang("Socket-Success")
+
+                if (!gemConfig.socketSection.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
+                if (!gemConfig.socketSection.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
+                if (!gemConfig.socketSection.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
+                    .takeMoney(player, moneyAmountResult)
+                if (!gemConfig.socketSection.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
+                    .takePoint(player, pointAmountResult)
+            } else {
+                resultMap["Chance.Result"] = false
+                resultMap["Chance.Amount"] = chance
+
+                player.sendLang("Socket-Fail")
+
+                if (!gemConfig.socketSection.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
+                if (!gemConfig.socketSection.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
+                if (!gemConfig.socketSection.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
+                    .takeMoney(player, moneyAmountResult)
+                if (!gemConfig.socketSection.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
+                    .takePoint(player, pointAmountResult)
+            }
         } else {
-            if (!enableResult) player.sendLang("Socket-Not-Enable")
+            if (!enableResult) player.sendLang("Socket-Disable")
             if (!slotResult) player.sendLang("Socket-No-Slot")
             if (!tableResult) player.sendLang("Socket-Table-Not-Match")
             if (!ketherResult) player.sendLang("Error-Condition-Not-Met")
@@ -138,5 +168,6 @@ object DefaultInventory {
             )
         }
 
+        return resultMap
     }
 }

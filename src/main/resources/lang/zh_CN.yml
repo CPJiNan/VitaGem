@@ -13,6 +13,8 @@ Error-Money-Not-Enough: "&c金币不足.执行该操作需要 {0} 金币."
 Error-Point-Not-Enough: "&c点券不足.执行该操作需要 {0} 点券."
 
 # 镶嵌相关
-Socket-Not-Enable: "&c未启用该宝石的镶嵌功能."
+Socket-Success: "&7镶嵌成功."
+Socket-Fail: "&7镶嵌失败."
+Socket-Disable: "&c未启用宝石的镶嵌功能."
 Socket-No-Slot: "&c当前物品无可镶嵌槽位."
 Socket-Table-Not-Match: "&c无法在当前界面镶嵌此宝石."
