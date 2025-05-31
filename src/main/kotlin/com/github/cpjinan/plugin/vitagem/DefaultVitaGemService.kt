@@ -177,8 +177,8 @@ object DefaultVitaGemService : VitaGemService {
             !hookAPI.getVault().isMoneyEnough(player, money)
         ) {
             map["Result"] = false
-            map["Money_Enough"] = false
-            map["Money_Amount"] = money
+            map["Money.Enough"] = false
+            map["Money.Amount"] = money
         }
 
         val point = section.getInt("Point", 0)
@@ -186,8 +186,8 @@ object DefaultVitaGemService : VitaGemService {
             !hookAPI.getPlayerPoints().isPointEnough(player, point)
         ) {
             map["Result"] = false
-            map["Point_Enough"] = false
-            map["Point_Amount"] = point
+            map["Point.Enough"] = false
+            map["Point.Amount"] = point
         }
 
         return map
@@ -236,8 +236,8 @@ object DefaultVitaGemService : VitaGemService {
             !hookAPI.getVault().isMoneyEnough(player, money)
         ) {
             map["Result"] = false
-            map["Money_Enough"] = false
-            map["Money_Amount"] = money
+            map["Money.Enough"] = false
+            map["Money.Amount"] = money
         }
 
         val point = section.getInt("Point", 0)
@@ -245,8 +245,8 @@ object DefaultVitaGemService : VitaGemService {
             !hookAPI.getPlayerPoints().isPointEnough(player, point)
         ) {
             map["Result"] = false
-            map["Point_Enough"] = false
-            map["Point_Amount"] = point
+            map["Point.Enough"] = false
+            map["Point.Amount"] = point
         }
 
         return map

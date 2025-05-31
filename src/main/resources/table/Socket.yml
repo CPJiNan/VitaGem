@@ -10,6 +10,13 @@ Socket:
     - '####S####'
     - '#########'
     - '####C####'
+  # 界面类型
+  Type: "Socket"
+  # 镶嵌设置
+  Socket:
+    Symbol:
+      Item: "I"
+      Gem: "G"
   # 图标
   Icon:
     '#':
