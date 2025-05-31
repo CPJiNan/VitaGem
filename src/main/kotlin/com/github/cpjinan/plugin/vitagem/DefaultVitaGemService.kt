@@ -138,6 +138,9 @@ object DefaultVitaGemService : VitaGemService {
     @Awake(LifeCycle.ENABLE)
     fun onEnable() {
         plugin.releaseResource(
+            "gem/Example.yml"
+        )
+        plugin.releaseResource(
             "table/Socket.yml"
         )
         plugin.releaseResource(
