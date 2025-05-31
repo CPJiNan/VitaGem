@@ -13,12 +13,20 @@ class DefaultVitaGemAPI : VitaGemAPI {
     /** 业务逻辑接口 **/
     var localService = PlatformFactory.getAPI<VitaGemService>()
 
+    /** 插件挂钩接口 **/
+    var localHook = PlatformFactory.getAPI<VitaGemHook>()
+
     /** 语言拓展接口 **/
     var localLanguage = PlatformFactory.getAPI<VitaGemLanguage>()
 
     /** 获取业务逻辑接口 **/
     override fun getService(): VitaGemService {
         return localService
+    }
+
+    /** 获取插件挂钩接口 **/
+    override fun getHook(): VitaGemHook {
+        return localHook
     }
 
     /** 获取语言文件接口 **/

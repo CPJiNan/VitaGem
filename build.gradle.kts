@@ -14,6 +14,7 @@ taboolib {
         install(
             Metrics,
             CommandHelper,
+            Kether,
             Bukkit,
             BukkitUI,
             BukkitHook,

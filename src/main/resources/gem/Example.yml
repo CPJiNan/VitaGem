@@ -24,14 +24,9 @@ Example:
     # 费用
     Cost:
       # Vault 金钱
-      # 格式: "数值 权重"
-      # 使用 "最小值~最大值" 获取范围内随机数值
-      Money:
-        - "100~200 25"
-        - "500 20~25"
-        - "1000 75"
+      Money: 100
       # PlayerPoints 点券
-      Point: [ ]
+      Point: 0
     # 返还
     Return:
       Success:
@@ -67,12 +62,9 @@ Example:
     # 费用
     Cost:
       # Vault 金钱
-      Money:
-        - "100~200 25"
-        - "500 20~25"
-        - "1000 75"
+      Money: 100
       # PlayerPoints 点券
-      Point: [ ]
+      Point: 0
     # 返还
     Return:
       Success:

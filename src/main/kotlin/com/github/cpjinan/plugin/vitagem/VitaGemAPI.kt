@@ -11,6 +11,9 @@ interface VitaGemAPI {
     /** 获取业务逻辑接口 **/
     fun getService(): VitaGemService
 
+    /** 获取插件挂钩接口 **/
+    fun getHook(): VitaGemHook
+
     /** 获取语言文件接口 **/
     fun getLanguage(): VitaGemLanguage
 }

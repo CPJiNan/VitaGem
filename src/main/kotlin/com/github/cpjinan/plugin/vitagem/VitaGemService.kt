@@ -32,17 +32,20 @@ interface VitaGemService {
     fun getSlot(): List<String>
 
     /** 物品的所有槽位数量 **/
-    fun hasSlot(item: ItemStack): Map<GemConfigData, Int>
+    fun getSlot(item: ItemStack): Map<GemConfigData, Int>
 
     /** 物品的指定槽位数量 **/
-    fun hasSlot(item: ItemStack, data: GemConfigData): Int
+    fun getSlot(item: ItemStack, data: GemConfigData): Int
 
     /** 获取所有宝石槽位 **/
     fun getDisplay(): List<String>
 
     /** 物品的所有宝石槽位数量 **/
-    fun hasDisplay(item: ItemStack): Map<GemConfigData, Int>
+    fun getDisplay(item: ItemStack): Map<GemConfigData, Int>
 
     /** 物品的指定宝石槽位数量 **/
-    fun hasDisplay(item: ItemStack, data: GemConfigData): Int
+    fun getDisplay(item: ItemStack, data: GemConfigData): Int
+
+    /** 是否满足镶嵌条件 **/
+    fun isSocketConditionMet(player: Player, item: ItemStack, data: GemConfigData, table: String): Map<String, Any>
 }

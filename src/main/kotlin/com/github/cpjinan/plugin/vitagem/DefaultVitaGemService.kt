@@ -5,6 +5,7 @@ import com.github.cpjinan.plugin.vitagem.data.GemConfigData
 import com.github.cpjinan.plugin.vitagem.data.TableConfigData
 import com.github.cpjinan.plugin.vitagem.gui.DefaultInventory
 import com.github.cpjinan.plugin.vitagem.utils.FileUtils.releaseResource
+import com.github.cpjinan.plugin.vitagem.utils.KetherUtils.evalKether
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.LifeCycle
@@ -100,15 +101,15 @@ object DefaultVitaGemService : VitaGemService {
         return gemConfigDataMap.values.map { it.slot }
     }
 
-    /** 物品的所有槽位数量 **/
-    override fun hasSlot(item: ItemStack): Map<GemConfigData, Int> {
+    /** 物品的所有镶嵌槽位数量 **/
+    override fun getSlot(item: ItemStack): Map<GemConfigData, Int> {
         return gemConfigDataMap.values.associateWith {
-            hasSlot(item, it)
+            getSlot(item, it)
         }
     }
 
-    /** 物品的指定槽位数量 **/
-    override fun hasSlot(item: ItemStack, data: GemConfigData): Int {
+    /** 物品的指定镶嵌槽位数量 **/
+    override fun getSlot(item: ItemStack, data: GemConfigData): Int {
         return item.itemMeta.lore.count {
             it.contains(data.slot)
         }
@@ -120,17 +121,75 @@ object DefaultVitaGemService : VitaGemService {
     }
 
     /** 物品的所有宝石槽位数量 **/
-    override fun hasDisplay(item: ItemStack): Map<GemConfigData, Int> {
+    override fun getDisplay(item: ItemStack): Map<GemConfigData, Int> {
         return gemConfigDataMap.values.associateWith {
-            hasDisplay(item, it)
+            getDisplay(item, it)
         }
     }
 
     /** 物品的指定宝石槽位数量 **/
-    override fun hasDisplay(item: ItemStack, data: GemConfigData): Int {
+    override fun getDisplay(item: ItemStack, data: GemConfigData): Int {
         return item.itemMeta.lore.count {
             it.contains(data.display)
         }
+    }
+
+    /** 是否满足镶嵌条件 **/
+    override fun isSocketConditionMet(
+        player: Player,
+        item: ItemStack,
+        data: GemConfigData,
+        table: String
+    ): Map<String, Any> {
+        val section = data.socketSection
+        val map = hashMapOf<String, Any>("Result" to true)
+
+        if (!section.getBoolean("Enable")) {
+            map["Result"] = false
+            map["Enable"] = true
+            return map
+        }
+
+        if (getSlot(item, data) == 0) {
+            map["Result"] = false
+            map["Slot"] = true
+            return map
+        }
+
+        val tableList = section.getStringList("Condition.Table")
+        if (tableList.isNotEmpty() && table !in tableList) {
+            map["Result"] = false
+            map["Table"] = true
+            return map
+        }
+
+        if (!section.getStringList("Condition.Kether").all { it.evalKether(player).toString().toBoolean() }) {
+            map["Result"] = false
+            map["Kether"] = true
+            return map
+        }
+
+        val hookAPI = VitaGem.api().getHook()
+
+        val money = section.getDouble("Money")
+        if (hookAPI.getVault().isPluginEnabled() &&
+            !hookAPI.getVault().isMoneyEnough(player, money)
+        ) {
+            map["Result"] = false
+            map["Money"] = true
+            map["MoneyAmount"] = money
+        }
+
+        val point = section.getInt("Point")
+        if (hookAPI.getPlayerPoints().isPluginEnabled() &&
+            !hookAPI.getPlayerPoints().isPointEnough(player, point)
+        ) {
+            map["Result"] = false
+            map["Point"] = true
+            map["PointAmount"] = point
+        }
+
+        return map
     }
 
     @Awake(LifeCycle.CONST)
