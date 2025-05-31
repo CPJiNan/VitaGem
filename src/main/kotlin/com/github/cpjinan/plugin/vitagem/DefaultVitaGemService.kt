@@ -84,15 +84,53 @@ object DefaultVitaGemService : VitaGemService {
     }
 
     /** 获取宝石配置 **/
-    override fun getGemData(item: ItemStack): List<GemConfigData> {
+    override fun getGem(item: ItemStack): List<GemConfigData> {
         return gemConfigDataMap.values.filter { gemConfigData ->
-            isItemGem(item, gemConfigData)
+            isGem(item, gemConfigData)
         }
     }
 
     /** 物品是否为宝石 **/
-    override fun isItemGem(item: ItemStack, data: GemConfigData): Boolean {
+    override fun isGem(item: ItemStack, data: GemConfigData): Boolean {
         return Arim.itemMatch.match(item, data.item)
+    }
+
+    /** 获取所有镶嵌槽位 **/
+    override fun getSlot(): List<String> {
+        return gemConfigDataMap.values.map { it.slot }
+    }
+
+    /** 物品的所有槽位数量 **/
+    override fun hasSlot(item: ItemStack): Map<GemConfigData, Int> {
+        return gemConfigDataMap.values.associateWith {
+            hasSlot(item, it)
+        }
+    }
+
+    /** 物品的指定槽位数量 **/
+    override fun hasSlot(item: ItemStack, data: GemConfigData): Int {
+        return item.itemMeta.lore.count {
+            it.contains(data.slot)
+        }
+    }
+
+    /** 获取所有宝石槽位 **/
+    override fun getDisplay(): List<String> {
+        return gemConfigDataMap.values.map { it.display }
+    }
+
+    /** 物品的所有宝石槽位数量 **/
+    override fun hasDisplay(item: ItemStack): Map<GemConfigData, Int> {
+        return gemConfigDataMap.values.associateWith {
+            hasDisplay(item, it)
+        }
+    }
+
+    /** 物品的指定宝石槽位数量 **/
+    override fun hasDisplay(item: ItemStack, data: GemConfigData): Int {
+        return item.itemMeta.lore.count {
+            it.contains(data.display)
+        }
     }
 
     @Awake(LifeCycle.CONST)

@@ -23,8 +23,26 @@ interface VitaGemService {
     fun openGUI(player: Player, table: String)
 
     /** 获取宝石配置 **/
-    fun getGemData(item: ItemStack): List<GemConfigData>
+    fun getGem(item: ItemStack): List<GemConfigData>
 
     /** 物品是否为宝石 **/
-    fun isItemGem(item: ItemStack, data: GemConfigData): Boolean
+    fun isGem(item: ItemStack, data: GemConfigData): Boolean
+
+    /** 获取所有镶嵌槽位 **/
+    fun getSlot(): List<String>
+
+    /** 物品的所有槽位数量 **/
+    fun hasSlot(item: ItemStack): Map<GemConfigData, Int>
+
+    /** 物品的指定槽位数量 **/
+    fun hasSlot(item: ItemStack, data: GemConfigData): Int
+
+    /** 获取所有宝石槽位 **/
+    fun getDisplay(): List<String>
+
+    /** 物品的所有宝石槽位数量 **/
+    fun hasDisplay(item: ItemStack): Map<GemConfigData, Int>
+
+    /** 物品的指定宝石槽位数量 **/
+    fun hasDisplay(item: ItemStack, data: GemConfigData): Int
 }
