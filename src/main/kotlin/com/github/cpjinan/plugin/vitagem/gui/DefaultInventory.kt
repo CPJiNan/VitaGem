@@ -244,7 +244,7 @@ object DefaultInventory {
                 }
 
                 if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
-                if (!section.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Success.Gem", false)) inv.setItem(gemSlot, null)
                 if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
                     .takeMoney(player, moneyAmount)
                 if (!section.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
@@ -253,7 +253,7 @@ object DefaultInventory {
                 player.sendLang("Socket-Fail")
 
                 if (!section.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
-                if (!section.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Fail.Gem", false)) inv.setItem(gemSlot, null)
                 if (!section.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
                     .takeMoney(player, moneyAmount)
                 if (!section.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
@@ -381,31 +381,47 @@ object DefaultInventory {
             return resultMap
         } else resultMap["Cancel.Result"] = false
 
-        if (result) {
-            if (resultMap["Chance.Result"] as? Boolean ?: true) {
-                player.sendLang("Extract-Success")
-
-                item.modifyLore {
-                    for ((index, element) in this.withIndex()) {
-                        if (element == gemConfig.slot) {
-                            set(index, gemConfig.display)
-                            addAll(index + 1, gemConfig.attribute)
-                            break
+        fun extractGem() {
+            item.modifyLore {
+                var index = -1
+                val display = gemConfig.display
+                val attribute = gemConfig.attribute
+                if (attribute.isEmpty()) index = this.indexOf(display)
+                for (i in 0..this.size - 1 - attribute.size) {
+                    if (this[i] == display) {
+                        var match = true
+                        for (j in attribute.indices) {
+                            if (this[i + 1 + j] != attribute[j]) {
+                                match = false
+                                break
+                            }
                         }
+                        if (match) index = i
                     }
                 }
+                if (index != -1) {
+                    set(index, gemConfig.slot)
+                    repeat(attribute.size) { removeAt(index + 1) }
+                }
+            }
+        }
 
+        if (result) {
+            if (resultMap["Chance.Result"] as? Boolean ?: true) {
+                extractGem()
+                player.sendLang("Extract-Success")
                 if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
-                if (!section.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
+                if (hookAPI.getItemTools().isPluginEnabled() && section.getBoolean("Return.Success.Gem", false)) {
+                    hookAPI.getItemTools().giveItem(player, section.getString("Item", "")!!)
+                }
                 if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
                     .takeMoney(player, moneyAmount)
                 if (!section.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
                     .takePoint(player, pointAmount)
             } else {
                 player.sendLang("Extract-Fail")
-
                 if (!section.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
-                if (!section.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Fail.Gem", false)) extractGem()
                 if (!section.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
                     .takeMoney(player, moneyAmount)
                 if (!section.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()

@@ -1,5 +1,6 @@
 package com.github.cpjinan.plugin.vitagem
 
+import com.github.cpjinan.plugin.vitagem.hook.ItemToolsHook
 import com.github.cpjinan.plugin.vitagem.hook.PlayerPointsHook
 import com.github.cpjinan.plugin.vitagem.hook.VaultHook
 
@@ -14,4 +15,6 @@ interface VitaGemHook {
     fun getVault(): VaultHook
 
     fun getPlayerPoints(): PlayerPointsHook
+
+    fun getItemTools(): ItemToolsHook
 }

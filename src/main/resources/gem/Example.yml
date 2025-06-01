@@ -53,6 +53,8 @@ Example:
     Enable: true
     # 成功率
     Chance: "0.3"
+    # 宝石物品 (ItemTools)
+    Item: ""
     # 条件
     Condition:
       # 限制拆卸界面 (留空则不指定界面)
@@ -70,7 +72,7 @@ Example:
       Success:
         # 拆卸成功返还物品
         Item: true
-        # 拆卸成功返还宝石
+        # 拆卸成功返还宝石 (ItemTools)
         Gem: true
         # 拆卸成功返还金钱
         Money: false
