@@ -12,7 +12,7 @@ Extract:
     - '####C####'
   # 界面类型
   Type: "Extract"
-  # 槽位设置
+  # 槽位
   Slot:
     Item: "I"
     Gem: "G"
