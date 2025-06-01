@@ -516,7 +516,25 @@ object DefaultInventory {
         val hookAPI = VitaGem.api().getHook()
 
         val gemItemList = serviceAPI.gemConfigDataMap.filterValues {
-            it.display in serviceAPI.getSlot(item).map { gemData -> gemData.key.display }
+            var index = -1
+            val display = it.display
+            val attribute = it.attribute
+            item.modifyLore {
+                if (attribute.isEmpty()) index = this.indexOf(display)
+                for (i in 0..this.size - 1 - attribute.size) {
+                    if (this[i] == display) {
+                        var match = true
+                        for (j in attribute.indices) {
+                            if (this[i + 1 + j] != attribute[j]) {
+                                match = false
+                                break
+                            }
+                        }
+                        if (match) index = i
+                    }
+                }
+            }
+            index != -1
         }.filterValues {
             val gemTable = it.section.getString("Condition.Table", "")!!
             gemTable.isEmpty() || table == gemTable
