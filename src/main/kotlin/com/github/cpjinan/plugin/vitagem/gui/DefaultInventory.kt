@@ -70,7 +70,7 @@ object DefaultInventory {
                         set(icon[0], item) {
                             clickEvent().isCancelled = true
                             clickEvent().run {
-                                val result = socketButton(
+                                socketButton(
                                     player,
                                     table,
                                     player.openInventory.topInventory,
