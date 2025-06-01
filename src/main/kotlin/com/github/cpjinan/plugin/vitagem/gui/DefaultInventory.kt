@@ -350,6 +350,7 @@ object DefaultInventory {
         val itemResult = (resultMap["Item"] ?: "null").toString()
         val gemResult = (resultMap["Gem"] ?: "null").toString()
         val slotResult = gemConfig.slot
+        val chanceResult = gemConfig.socketSection.getDouble("Chance") * 100
         val moneyEnoughResult = (resultMap["Money.Enough"] ?: "true").toString().toBoolean()
         val moneyAmountResult = (resultMap["Money.Amount"] ?: "0.0").toString().toDouble()
         val pointEnoughResult = (resultMap["Point.Enough"] ?: "true").toString().toBoolean()
@@ -360,6 +361,7 @@ object DefaultInventory {
             "%Item%" to itemResult,
             "%Gem%" to gemResult,
             "%Slot%" to slotResult,
+            "%Chance.Amount%" to chanceResult,
             "%Money.Enough%" to moneyEnoughResult,
             "%Money.Amount%" to moneyAmountResult,
             "%Point.Enough%" to pointEnoughResult,

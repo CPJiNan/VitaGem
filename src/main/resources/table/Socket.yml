@@ -25,7 +25,7 @@ Socket:
         - "&6◆ &f所选物品: &a%Item%"
         - "&6◆ &f所选宝石: &a%Gem%"
         - "&6◆ &f镶嵌槽位: &a%Slot%"
-        - "&6◆ &f成功率: &a+%Chance%%"
+        - "&6◆ &f成功率: &a+%Chance.Amount%%"
         - "&6◆ &f所需金钱: &a%Money.Amount%"
         - "&6◆ &f所需点券: &a%Point.Amount%"
         - "&6◆ &f满足镶嵌条件: &a%Result%"
