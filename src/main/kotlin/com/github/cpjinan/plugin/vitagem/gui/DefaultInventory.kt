@@ -74,8 +74,8 @@ object DefaultInventory {
                                     player,
                                     table,
                                     player.openInventory.topInventory,
-                                    getSlots(tableOptions["Slot.Item"].toString()[0])[0],
-                                    getSlots(tableOptions["Slot.Gem"].toString()[0])[0]
+                                    getSlots((tableOptions["Slot.Item"] as String)[0])[0],
+                                    getSlots((tableOptions["Slot.Gem"] as String)[0])[0]
                                 )
                                 section.getStringList("Kether").evalKether(player)
                             }
