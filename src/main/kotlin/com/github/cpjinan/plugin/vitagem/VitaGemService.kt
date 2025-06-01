@@ -45,10 +45,4 @@ interface VitaGemService {
 
     /** 获取物品宝石槽位数量 **/
     fun getDisplay(item: ItemStack, data: GemConfigData): Int
-
-    /** 是否满足镶嵌条件 **/
-    fun isSocketConditionMet(player: Player, item: ItemStack, data: GemConfigData, table: String): Map<String, Any>
-
-    /** 是否满足拆卸条件 **/
-    fun isExtractConditionMet(player: Player, item: ItemStack, data: GemConfigData, table: String): Map<String, Any>
 }

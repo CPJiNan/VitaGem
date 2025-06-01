@@ -1,6 +1,8 @@
 package com.github.cpjinan.plugin.vitagem.gui
 
+import com.github.cpjinan.plugin.vitagem.DefaultVitaGemService.getSlot
 import com.github.cpjinan.plugin.vitagem.VitaGem
+import com.github.cpjinan.plugin.vitagem.data.GemConfigData
 import com.github.cpjinan.plugin.vitagem.event.PlayerSocketEvent
 import com.github.cpjinan.plugin.vitagem.utils.KetherUtils.evalKether
 import com.github.cpjinan.plugin.vitagem.utils.RandomUtils
@@ -8,11 +10,8 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
-import taboolib.common5.util.replace
-import taboolib.library.configuration.ConfigurationSection
+import org.bukkit.inventory.ItemStack
 import taboolib.library.xseries.XMaterial
-import taboolib.module.chat.colored
-import taboolib.module.nms.getName
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Chest
 import taboolib.platform.compat.replacePlaceholder
@@ -46,19 +45,8 @@ object DefaultInventory {
             val tableOptions = when (tableType) {
                 "Socket" -> {
                     hashMapOf(
-                        "Socket.Symbol.Item" to tableSection.getString("Socket.Symbol.Item", "I")!!,
-                        "Socket.Symbol.Gem" to tableSection.getString("Socket.Symbol.Gem", "G")!!,
-                        "Socket.Symbol.Preview" to tableSection.getString("Socket.Symbol.Preview", "S")!!,
-                        "Socket.Preview.Enable" to tableSection.getBoolean("Socket.Preview.Enable", true),
-                        "Socket.Preview.Lore" to tableSection.getStringList("Socket.Preview.Lore"),
-                        "Socket.Preview.Replace" to tableSection.getConfigurationSection("Socket.Preview.Replace")
-                    )
-                }
-
-                "Extract" -> {
-                    hashMapOf(
-                        "Extract.Symbol.Item" to tableSection.getString("Extract.Symbol.Item", "I")!!,
-                        "Extract.Symbol.Gem" to tableSection.getString("Extract.Symbol.Gem", "G")!!
+                        "Slot.Item" to tableSection.getString("Slot.Item", "I")!!,
+                        "Slot.Gem" to tableSection.getString("Slot.Gem", "G")!!
                     )
                 }
 
@@ -86,26 +74,10 @@ object DefaultInventory {
                                     player,
                                     table,
                                     player.openInventory.topInventory,
-                                    getSlots(tableOptions["Socket.Symbol.Item"].toString()[0])[0],
-                                    getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0])[0]
+                                    getSlots(tableOptions["Slot.Item"].toString()[0])[0],
+                                    getSlots(tableOptions["Slot.Gem"].toString()[0])[0]
                                 )
-                                section.getStringList("Kether")
-                                    .replace(
-                                        "%Result%" to (result["Result"] ?: "false"),
-                                        "%Enable%" to (result["Enable"] ?: "true"),
-                                        "%Cancel%" to (result["Cancel"] ?: "false"),
-                                        "%Match%" to (result["Match"] ?: "true"),
-                                        "%Slot%" to (result["Slot"] ?: "true"),
-                                        "%Table%" to (result["Table"] ?: "true"),
-                                        "%Kether%" to (result["Kether"] ?: "true"),
-                                        "%Chance.Result%" to (result["Chance.Result"] ?: "true"),
-                                        "%Chance.Amount%" to (result["Chance.Amount"] ?: "1.0"),
-                                        "%Money.Enough%" to (result["Money.Enough"] ?: "true"),
-                                        "%Money.Amount%" to (result["Money.Amount"] ?: "0.0"),
-                                        "%Point.Enough%" to (result["Point.Enough"] ?: "true"),
-                                        "%Point.Amount%" to (result["Point.Amount"] ?: "0")
-                                    )
-                                    .evalKether(player)
+                                section.getStringList("Kether").evalKether(player)
                             }
                         }
                     }
@@ -136,8 +108,8 @@ object DefaultInventory {
                 when (tableType) {
                     "Socket" -> {
                         mutableListOf<Int>().apply {
-                            addAll(getSlots(tableOptions["Socket.Symbol.Item"].toString()[0]))
-                            addAll(getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0]))
+                            addAll(getSlots((tableOptions["Slot.Item"] as String)[0]))
+                            addAll(getSlots((tableOptions["Slot.Gem"] as String)[0]))
                         }
                     }
 
@@ -151,34 +123,36 @@ object DefaultInventory {
                     }
                 }
             }
-
-            when (tableType) {
-                "Socket" -> {
-                    onClick(tableOptions["Socket.Symbol.Gem"].toString()[0]) {
-                        @Suppress("UNCHECKED_CAST")
-                        if (tableOptions["Socket.Preview.Enable"].toString().toBoolean()) refreshSocketPreview(
-                            player,
-                            table,
-                            player.openInventory.topInventory,
-                            getSlots(tableOptions["Socket.Symbol.Item"].toString()[0])[0],
-                            getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0])[0],
-                            getSlots(tableOptions["Socket.Symbol.Preview"].toString()[0])[0],
-                            tableOptions["Socket.Preview.Lore"] as List<String>,
-                            tableOptions["Socket.Preview.Replace"] as ConfigurationSection,
-                        )
-                    }
-                }
-
-                "Extract" -> {
-                    onClick(tableOptions["Socket.Symbol.Gem"].toString()[0]) {
-                        it.isCancelled = true
-                    }
-                }
-            }
         }
     }
 
-    /** 镶嵌按钮 **/
+    /** 镶嵌按钮
+     *
+     * Result Boolean 镶嵌是否成功
+     *
+     * Data GemConfigData 宝石配置数据
+     * Enable.Result Boolean 镶嵌是否启用
+     * Slot.Name String 镶嵌槽位名称
+     * Slot.Result Boolean 物品有无镶嵌槽位
+     * Table.Name String 限制界面名称
+     * Table.Result Boolean 界面是否匹配
+     * Kether.Result Boolean 脚本条件是否满足
+     * Money.Result Boolean 金钱是否足够
+     * Money.Amount Double 消耗金钱数量
+     * Point.Result Boolean 点券是否足够
+     * Point.Amount Double 消耗点券数量
+     *
+     * Item.Result Boolean 物品是否放入槽位
+     * Item.Item ItemStack 放入槽位的物品
+     * Gem.Result Boolean 宝石是否放入槽位
+     * Gem.Item ItemStack 放入槽位的宝石
+     * Match.Result Boolean 物品是否有宝石槽位
+     * Table.Result Boolean 宝石是否与界面匹配
+     * Chance.Result Boolean 镶嵌随机结果
+     * Chance.Amount Double 镶嵌成功概率
+     * Cancel.Result Boolean 事件是否取消
+     *
+     */
     fun socketButton(
         player: Player,
         table: String,
@@ -186,59 +160,76 @@ object DefaultInventory {
         itemSlot: Int,
         gemSlot: Int
     ): Map<String, Any> {
-        var resultMap = hashMapOf<String, Any>("Result" to false)
+        val resultMap = hashMapOf<String, Any>("Result" to false)
 
         val item = inv.getItem(itemSlot)
         if (item == null || item.isAir || item.type == Material.AIR) {
+            resultMap["Item.Result"] = false
             player.sendLang("Socket-No-Item")
             return resultMap
-        } else resultMap["Item"] = item
+        } else {
+            resultMap["Item.Result"] = true
+            resultMap["Item.Item"] = item
+        }
 
         val gemItem = inv.getItem(gemSlot)
         if (gemItem == null || gemItem.isAir || gemItem.type == Material.AIR) {
+            resultMap["Gem.Result"] = false
             player.sendLang("Socket-No-Gem")
             return resultMap
-        } else resultMap["Gem"] = gemItem
+        } else {
+            resultMap["Gem.Result"] = true
+            resultMap["Gem.Item"] = gemItem
+        }
 
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
 
-        val gemConfigList = serviceAPI.getGem(gemItem).filter {
+        var gemConfigList =
+            serviceAPI.getGem(gemItem).filter { it.slot in getSlot(item).keys.map { gemData -> gemData.slot } }
+        if (gemConfigList.isEmpty()) {
+            resultMap["Match.Result"] = false
+            player.sendLang("Socket-Gem-Not-Match")
+            return resultMap
+        } else resultMap["Match.Result"] = true
+
+        gemConfigList = gemConfigList.filter {
             val gemTable = it.section.getString("Condition.Table", "")!!
             gemTable.isEmpty() || table == gemTable
         }
         if (gemConfigList.isEmpty()) {
-            resultMap["Match"] = false
-            player.sendLang("Socket-Gem-Not-Match")
+            resultMap["Table.Result"] = false
+            player.sendLang("Socket-Table-Not-Match")
             return resultMap
-        }
+        } else resultMap["Table.Result"] = true
+
         val gemConfig = gemConfigList[0]
         val section = gemConfig.socketSection
 
-        resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>
-        val result = (resultMap["Result"] ?: "false").toString().toBoolean()
-        val enableResult = (resultMap["Enable"] ?: "true").toString().toBoolean()
-        val slotResult = (resultMap["Slot"] ?: "true").toString().toBoolean()
-        val tableResult = (resultMap["Table"] ?: "true").toString().toBoolean()
-        val ketherResult = (resultMap["Kether"] ?: "true").toString().toBoolean()
-        val moneyEnoughResult = (resultMap["Money.Enough"] ?: "true").toString().toBoolean()
-        val moneyAmountResult = (resultMap["Money.Amount"] ?: "0.0").toString().toDouble()
-        val pointEnoughResult = (resultMap["Point.Enough"] ?: "true").toString().toBoolean()
-        val pointAmountResult = (resultMap["Point.Amount"] ?: "0").toString().toInt()
+        resultMap.putAll(isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>)
+        val result = resultMap["Result"] as Boolean
+        val enableResult = resultMap["Enable.Result"] as Boolean
+        val slotResult = resultMap["Slot.Result"] as Boolean
+        val tableResult = resultMap["Table.Result"] as Boolean
+        val ketherResult = resultMap["Kether.Result"] as Boolean
+        val moneyResult = resultMap["Money.Result"] as Boolean
+        val moneyAmount = resultMap["Money.Amount"] as Double
+        val pointResult = resultMap["Point.Result"] as Boolean
+        val pointAmount = resultMap["Point.Amount"] as Int
 
         resultMap["Chance.Amount"] =
             Arim.fixedCalculator.evaluate(section.getString("Chance", "1.0")!!.replacePlaceholder(player))
-        resultMap["Chance.Result"] = RandomUtils.randomBoolean(resultMap["Chance.Amount"].toString().toDouble())
+        resultMap["Chance.Result"] = RandomUtils.randomBoolean(resultMap["Chance.Amount"] as Double)
 
         val event = PlayerSocketEvent(player, resultMap)
         event.call()
         if (event.isCancelled) {
-            resultMap["Cancel"] = true
+            resultMap["Cancel.Result"] = true
             return resultMap
-        }
+        } else resultMap["Cancel.Result"] = false
 
         if (result) {
-            if (resultMap["Chance.Result"].toString().toBoolean()) {
+            if (resultMap["Chance.Result"] as Boolean) {
                 player.sendLang("Socket-Success")
 
                 item.modifyLore {
@@ -254,32 +245,32 @@ object DefaultInventory {
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
-                    .takeMoney(player, moneyAmountResult)
+                    .takeMoney(player, moneyAmount)
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
-                    .takePoint(player, pointAmountResult)
+                    .takePoint(player, pointAmount)
             } else {
                 player.sendLang("Socket-Fail")
 
                 if (!gemConfig.socketSection.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
                 if (!gemConfig.socketSection.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
                 if (!gemConfig.socketSection.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
-                    .takeMoney(player, moneyAmountResult)
+                    .takeMoney(player, moneyAmount)
                 if (!gemConfig.socketSection.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
-                    .takePoint(player, pointAmountResult)
+                    .takePoint(player, pointAmount)
             }
         } else {
             if (!enableResult) player.sendLang("Socket-Disable")
             if (!slotResult) player.sendLang("Socket-No-Slot")
             if (!tableResult) player.sendLang("Socket-Table-Not-Match")
             if (!ketherResult) player.sendLang("Error-Condition-Not-Met")
-            if (!moneyEnoughResult) player.sendLang(
+            if (!moneyResult) player.sendLang(
                 "Error-Money-Not-Enough",
-                moneyAmountResult,
+                moneyAmount,
                 hookAPI.getVault().lookMoney(player)
             )
-            if (!pointEnoughResult) player.sendLang(
+            if (!pointResult) player.sendLang(
                 "Error-Money-Not-Enough",
-                pointAmountResult,
+                pointAmount,
                 hookAPI.getPlayerPoints().lookPoint(player)
             )
         }
@@ -287,81 +278,66 @@ object DefaultInventory {
         return resultMap
     }
 
-    /** 镶嵌预览 **/
-    fun refreshSocketPreview(
+    /** 是否满足镶嵌条件 **/
+    fun isSocketConditionMet(
         player: Player,
-        table: String,
-        inv: Inventory,
-        itemSlot: Int,
-        gemSlot: Int,
-        previewSlot: Int,
-        previewLore: List<String>,
-        replace: ConfigurationSection
-    ) {
-        var resultMap = hashMapOf<String, Any>("Result" to false)
-        val previewItem = inv.getItem(previewSlot)
-        var lore = previewLore
+        item: ItemStack,
+        data: GemConfigData,
+        table: String
+    ): Map<String, Any> {
+        val section = data.socketSection
+        val result = hashMapOf<String, Any>("Result" to true)
 
-        val item = inv.getItem(itemSlot)
-        if (item == null || item.isAir || item.type == Material.AIR) {
-            previewItem.modifyLore {
-                clear()
-            }
-            return
-        } else resultMap["Item"] = item.getName()
+        result["Data"] = data
 
-        val gemItem = inv.getItem(gemSlot)
-        if (gemItem == null || gemItem.isAir || gemItem.type == Material.AIR) {
-            previewItem.modifyLore {
-                clear()
-            }
-            return
-        } else resultMap["Gem"] = gemItem.getName()
+        if (!section.getBoolean("Enable", false)) {
+            result["Result"] = false
+            result["Enable.Result"] = false
+            return result
+        } else result["Enable.Result"] = true
 
-        val serviceAPI = VitaGem.api().getService()
+        result["Slot.Name"] = data.slot
+        if (getSlot(item, data) == 0) {
+            result["Result"] = false
+            result["Slot.Result"] = false
+            return result
+        } else result["Slot.Result"] = true
 
-        val gemConfigList = serviceAPI.getGem(gemItem).filter {
-            val gemTable = it.section.getString("Condition.Table", "")!!
-            gemTable.isEmpty() || table == gemTable
-        }
-        if (gemConfigList.isEmpty()) {
-            previewItem.modifyLore {
-                clear()
-            }
-            return
-        }
-        val gemConfig = gemConfigList[0]
+        val tableCondition = section.getString("Condition.Table", "")!!
+        result["Table.Name"] = tableCondition
+        if (tableCondition.isNotEmpty() && table != tableCondition) {
+            result["Result"] = false
+            result["Table.Result"] = false
+            return result
+        } else result["Table.Result"] = true
 
-        resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>
-        val result = (resultMap["Result"] ?: "false").toString()
-        val itemResult = (resultMap["Item"] ?: "null").toString()
-        val gemResult = (resultMap["Gem"] ?: "null").toString()
-        val slotResult = gemConfig.slot
-        val chanceResult = gemConfig.socketSection.getDouble("Chance") * 100
-        val moneyEnoughResult = (resultMap["Money.Enough"] ?: "true").toString().toBoolean()
-        val moneyAmountResult = (resultMap["Money.Amount"] ?: "0.0").toString().toDouble()
-        val pointEnoughResult = (resultMap["Point.Enough"] ?: "true").toString().toBoolean()
-        val pointAmountResult = (resultMap["Point.Amount"] ?: "0").toString().toInt()
+        val ketherCondition = section.getStringList("Condition.Kether")
+        if (!ketherCondition.all { it.evalKether(player).toString().toBoolean() }) {
+            result["Result"] = false
+            result["Kether.Result"] = false
+            return result
+        } else result["Kether.Result"] = true
 
-        lore = lore.replace(
-            "%Result%" to result,
-            "%Item%" to itemResult,
-            "%Gem%" to gemResult,
-            "%Slot%" to slotResult,
-            "%Chance.Amount%" to chanceResult,
-            "%Money.Enough%" to moneyEnoughResult,
-            "%Money.Amount%" to moneyAmountResult,
-            "%Point.Enough%" to pointEnoughResult,
-            "%Point.Amount%" to pointAmountResult
-        ).replacePlaceholder(player).colored()
+        val hookAPI = VitaGem.api().getHook()
 
-        replace.getKeys(false).forEach {
-            lore = lore.replace(it to replace.get(it)!!)
-        }
+        val money = section.getDouble("Money", 0.0)
+        result["Money.Amount"] = money
+        if (hookAPI.getVault().isPluginEnabled() &&
+            !hookAPI.getVault().isMoneyEnough(player, money)
+        ) {
+            result["Result"] = false
+            result["Money.Result"] = false
+        } else result["Money.Result"] = true
 
-        previewItem.modifyLore {
-            clear()
-            addAll(lore)
-        }
+        val point = section.getInt("Point", 0)
+        result["Point.Amount"] = point
+        if (hookAPI.getPlayerPoints().isPluginEnabled() &&
+            !hookAPI.getPlayerPoints().isPointEnough(player, point)
+        ) {
+            result["Result"] = false
+            result["Point.Result"] = false
+        } else result["Point.Result"] = true
+
+        return result
     }
 }
