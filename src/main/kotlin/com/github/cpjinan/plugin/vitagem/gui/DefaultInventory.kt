@@ -1,6 +1,5 @@
 package com.github.cpjinan.plugin.vitagem.gui
 
-import com.github.cpjinan.plugin.vitagem.DefaultVitaGemService.getSlot
 import com.github.cpjinan.plugin.vitagem.VitaGem
 import com.github.cpjinan.plugin.vitagem.data.GemConfigData
 import com.github.cpjinan.plugin.vitagem.event.PlayerSocketEvent
@@ -186,7 +185,8 @@ object DefaultInventory {
         val hookAPI = VitaGem.api().getHook()
 
         var gemConfigList =
-            serviceAPI.getGem(gemItem).filter { it.slot in getSlot(item).keys.map { gemData -> gemData.slot } }
+            serviceAPI.getGem(gemItem)
+                .filter { it.slot in serviceAPI.getSlot(item).keys.map { gemData -> gemData.slot } }
         if (gemConfigList.isEmpty()) {
             resultMap["Match.Result"] = false
             player.sendLang("Socket-Gem-Not-Match")
@@ -286,6 +286,7 @@ object DefaultInventory {
         table: String
     ): Map<String, Any> {
         val section = data.socketSection
+        val serviceAPI = VitaGem.api().getService()
         val result = hashMapOf<String, Any>("Result" to true)
 
         result["Data"] = data
@@ -297,11 +298,75 @@ object DefaultInventory {
         } else result["Enable.Result"] = true
 
         result["Slot.Name"] = data.slot
-        if (getSlot(item, data) == 0) {
+        if (serviceAPI.getSlot(item, data) == 0) {
             result["Result"] = false
             result["Slot.Result"] = false
             return result
         } else result["Slot.Result"] = true
+
+        val tableCondition = section.getString("Condition.Table", "")!!
+        result["Table.Name"] = tableCondition
+        if (tableCondition.isNotEmpty() && table != tableCondition) {
+            result["Result"] = false
+            result["Table.Result"] = false
+            return result
+        } else result["Table.Result"] = true
+
+        val ketherCondition = section.getStringList("Condition.Kether")
+        if (ketherCondition.isNotEmpty() && !ketherCondition.all { it.evalKether(player).toString().toBoolean() }) {
+            result["Result"] = false
+            result["Kether.Result"] = false
+            return result
+        } else result["Kether.Result"] = true
+
+        val hookAPI = VitaGem.api().getHook()
+
+        val money = section.getDouble("Money", 0.0)
+        result["Money.Amount"] = money
+        if (hookAPI.getVault().isPluginEnabled() &&
+            !hookAPI.getVault().isMoneyEnough(player, money)
+        ) {
+            result["Result"] = false
+            result["Money.Result"] = false
+        } else result["Money.Result"] = true
+
+        val point = section.getInt("Point", 0)
+        result["Point.Amount"] = point
+        if (hookAPI.getPlayerPoints().isPluginEnabled() &&
+            !hookAPI.getPlayerPoints().isPointEnough(player, point)
+        ) {
+            result["Result"] = false
+            result["Point.Result"] = false
+        } else result["Point.Result"] = true
+
+        return result
+    }
+
+    /** 是否满足拆卸条件 **/
+    fun isExtractConditionMet(
+        player: Player,
+        item: ItemStack,
+        data: GemConfigData,
+        table: String
+    ): Map<String, Any> {
+        val section = data.extractSection
+        val serviceAPI = VitaGem.api().getService()
+        val result = hashMapOf<String, Any>("Result" to true)
+
+        result["Data"] = data
+
+        if (!section.getBoolean("Enable", false)) {
+            result["Result"] = false
+            result["Enable.Result"] = false
+            return result
+        } else result["Enable.Result"] = true
+
+        result["Display.Name"] = data.display
+        if (serviceAPI.getDisplay(item, data) == 0) {
+            result["Result"] = false
+            result["Display.Result"] = false
+            return result
+        } else result["Display.Result"] = true
 
         val tableCondition = section.getString("Condition.Table", "")!!
         result["Table.Name"] = tableCondition
