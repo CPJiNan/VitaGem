@@ -207,19 +207,19 @@ object DefaultInventory {
         val section = gemConfig.socketSection
 
         resultMap.putAll(isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>)
-        val result = resultMap["Result"] as Boolean
-        val enableResult = resultMap["Enable.Result"] as Boolean
-        val slotResult = resultMap["Slot.Result"] as Boolean
-        val tableResult = resultMap["Table.Result"] as Boolean
-        val ketherResult = resultMap["Kether.Result"] as Boolean
-        val moneyResult = resultMap["Money.Result"] as Boolean
-        val moneyAmount = resultMap["Money.Amount"] as Double
-        val pointResult = resultMap["Point.Result"] as Boolean
-        val pointAmount = resultMap["Point.Amount"] as Int
+        val result = resultMap["Result"] as? Boolean ?: false
+        val enableResult = resultMap["Enable.Result"] as? Boolean ?: true
+        val slotResult = resultMap["Slot.Result"] as? Boolean ?: true
+        val tableResult = resultMap["Table.Result"] as? Boolean ?: true
+        val ketherResult = resultMap["Kether.Result"] as? Boolean ?: true
+        val moneyResult = resultMap["Money.Result"] as? Boolean ?: true
+        val moneyAmount = resultMap["Money.Amount"] as? Double ?: 0.0
+        val pointResult = resultMap["Point.Result"] as? Boolean ?: true
+        val pointAmount = resultMap["Point.Amount"] as? Int ?: 0
 
         resultMap["Chance.Amount"] =
             Arim.fixedCalculator.evaluate(section.getString("Chance", "1.0")!!.replacePlaceholder(player))
-        resultMap["Chance.Result"] = RandomUtils.randomBoolean(resultMap["Chance.Amount"] as Double)
+        resultMap["Chance.Result"] = RandomUtils.randomBoolean(resultMap["Chance.Amount"] as? Double ?: 1.0)
 
         val event = PlayerSocketEvent(player, resultMap)
         event.call()
@@ -229,7 +229,7 @@ object DefaultInventory {
         } else resultMap["Cancel.Result"] = false
 
         if (result) {
-            if (resultMap["Chance.Result"] as Boolean) {
+            if (resultMap["Chance.Result"] as? Boolean ?: true) {
                 player.sendLang("Socket-Success")
 
                 item.modifyLore {
