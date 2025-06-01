@@ -12,11 +12,10 @@ Extract:
     - '####C####'
   # 界面类型
   Type: "Extract"
-  # 拆卸设置
-  Extract:
-    Symbol:
-      Item: "I"
-      Gem: "G"
+  # 槽位设置
+  Slot:
+    Item: "I"
+    Gem: "G"
   # 图标
   Icon:
     '#':
