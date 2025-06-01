@@ -312,7 +312,7 @@ object DefaultInventory {
         } else result["Table.Result"] = true
 
         val ketherCondition = section.getStringList("Condition.Kether")
-        if (!ketherCondition.all { it.evalKether(player).toString().toBoolean() }) {
+        if (ketherCondition.isNotEmpty() && !ketherCondition.all { it.evalKether(player).toString().toBoolean() }) {
             result["Result"] = false
             result["Kether.Result"] = false
             return result
