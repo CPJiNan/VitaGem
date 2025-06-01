@@ -546,6 +546,7 @@ object DefaultInventory {
 
         gemSlot.forEach {
             if (gemItemList.isNotEmpty()) inv.setItem(it, gemItemList.removeFirstOrNull())
+            else inv.setItem(it, null)
         }
     }
 
