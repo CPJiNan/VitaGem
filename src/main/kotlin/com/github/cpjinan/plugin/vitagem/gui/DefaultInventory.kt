@@ -147,7 +147,7 @@ object DefaultInventory {
         }
     }
 
-    /** 出售按钮 **/
+    /** 镶嵌按钮 **/
     fun socketButton(
         player: Player,
         table: String,
