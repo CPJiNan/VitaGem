@@ -2,6 +2,7 @@ package com.github.cpjinan.plugin.vitagem.gui
 
 import com.github.cpjinan.plugin.vitagem.VitaGem
 import com.github.cpjinan.plugin.vitagem.data.GemConfigData
+import com.github.cpjinan.plugin.vitagem.event.PlayerExtractEvent
 import com.github.cpjinan.plugin.vitagem.event.PlayerSocketEvent
 import com.github.cpjinan.plugin.vitagem.utils.KetherUtils.evalKether
 import com.github.cpjinan.plugin.vitagem.utils.RandomUtils
@@ -242,26 +243,178 @@ object DefaultInventory {
                     }
                 }
 
-                if (!gemConfig.socketSection.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
-                if (!gemConfig.socketSection.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
-                if (!gemConfig.socketSection.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
+                if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
+                if (!section.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
                     .takeMoney(player, moneyAmount)
-                if (!gemConfig.socketSection.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
+                if (!section.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
                     .takePoint(player, pointAmount)
             } else {
                 player.sendLang("Socket-Fail")
 
-                if (!gemConfig.socketSection.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
-                if (!gemConfig.socketSection.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
-                if (!gemConfig.socketSection.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
+                if (!section.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
+                if (!section.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
                     .takeMoney(player, moneyAmount)
-                if (!gemConfig.socketSection.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
+                if (!section.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
                     .takePoint(player, pointAmount)
             }
         } else {
             if (!enableResult) player.sendLang("Socket-Disable")
             if (!slotResult) player.sendLang("Socket-No-Slot")
             if (!tableResult) player.sendLang("Socket-Table-Not-Match")
+            if (!ketherResult) player.sendLang("Error-Condition-Not-Met")
+            if (!moneyResult) player.sendLang(
+                "Error-Money-Not-Enough",
+                moneyAmount,
+                hookAPI.getVault().lookMoney(player)
+            )
+            if (!pointResult) player.sendLang(
+                "Error-Money-Not-Enough",
+                pointAmount,
+                hookAPI.getPlayerPoints().lookPoint(player)
+            )
+        }
+
+        return resultMap
+    }
+
+    /** 拆卸按钮
+     *
+     * Result Boolean 镶嵌是否成功
+     *
+     * Data GemConfigData 宝石配置数据
+     * Enable.Result Boolean 镶嵌是否启用
+     * Display.Name String 宝石槽位名称
+     * Display.Result Boolean 物品有无宝石槽位
+     * Table.Name String 限制界面名称
+     * Table.Result Boolean 界面是否匹配
+     * Kether.Result Boolean 脚本条件是否满足
+     * Money.Result Boolean 金钱是否足够
+     * Money.Amount Double 消耗金钱数量
+     * Point.Result Boolean 点券是否足够
+     * Point.Amount Double 消耗点券数量
+     *
+     * Item.Result Boolean 物品是否放入槽位
+     * Item.Item ItemStack 放入槽位的物品
+     * Gem.Result Boolean 宝石是否放入槽位
+     * Gem.Item ItemStack 放入槽位的宝石
+     * Match.Result Boolean 物品是否有宝石槽位
+     * Table.Result Boolean 宝石是否与界面匹配
+     * Chance.Result Boolean 镶嵌随机结果
+     * Chance.Amount Double 镶嵌成功概率
+     * Cancel.Result Boolean 事件是否取消
+     *
+     */
+    fun extractButton(
+        player: Player,
+        table: String,
+        inv: Inventory,
+        itemSlot: Int,
+        gemSlot: Int
+    ): Map<String, Any> {
+        val resultMap = hashMapOf<String, Any>("Result" to false)
+
+        val item = inv.getItem(itemSlot)
+        if (item == null || item.isAir || item.type == Material.AIR) {
+            resultMap["Item.Result"] = false
+            player.sendLang("Extract-No-Item")
+            return resultMap
+        } else {
+            resultMap["Item.Result"] = true
+            resultMap["Item.Item"] = item
+        }
+
+        val gemItem = inv.getItem(gemSlot)
+        if (gemItem == null || gemItem.isAir || gemItem.type == Material.AIR) {
+            resultMap["Gem.Result"] = false
+            return resultMap
+        } else {
+            resultMap["Gem.Result"] = true
+            resultMap["Gem.Item"] = gemItem
+        }
+
+        val serviceAPI = VitaGem.api().getService()
+        val hookAPI = VitaGem.api().getHook()
+
+        var gemConfigList =
+            serviceAPI.getGem(gemItem)
+                .filter { it.display in serviceAPI.getDisplay(item).keys.map { gemData -> gemData.display } }
+        if (gemConfigList.isEmpty()) {
+            resultMap["Match.Result"] = false
+            player.sendLang("Extract-Gem-Not-Match")
+            return resultMap
+        } else resultMap["Match.Result"] = true
+
+        gemConfigList = gemConfigList.filter {
+            val gemTable = it.section.getString("Condition.Table", "")!!
+            gemTable.isEmpty() || table == gemTable
+        }
+        if (gemConfigList.isEmpty()) {
+            resultMap["Table.Result"] = false
+            player.sendLang("Extract-Table-Not-Match")
+            return resultMap
+        } else resultMap["Table.Result"] = true
+
+        val gemConfig = gemConfigList[0]
+        val section = gemConfig.extractSection
+
+        resultMap.putAll(isExtractConditionMet(player, item, gemConfig, table) as HashMap<String, Any>)
+        val result = resultMap["Result"] as? Boolean ?: false
+        val enableResult = resultMap["Enable.Result"] as? Boolean ?: true
+        val displayResult = resultMap["Display.Result"] as? Boolean ?: true
+        val tableResult = resultMap["Table.Result"] as? Boolean ?: true
+        val ketherResult = resultMap["Kether.Result"] as? Boolean ?: true
+        val moneyResult = resultMap["Money.Result"] as? Boolean ?: true
+        val moneyAmount = resultMap["Money.Amount"] as? Double ?: 0.0
+        val pointResult = resultMap["Point.Result"] as? Boolean ?: true
+        val pointAmount = resultMap["Point.Amount"] as? Int ?: 0
+
+        resultMap["Chance.Amount"] =
+            Arim.fixedCalculator.evaluate(section.getString("Chance", "1.0")!!.replacePlaceholder(player))
+        resultMap["Chance.Result"] = RandomUtils.randomBoolean(resultMap["Chance.Amount"] as? Double ?: 1.0)
+
+        val event = PlayerExtractEvent(player, resultMap)
+        event.call()
+        if (event.isCancelled) {
+            resultMap["Cancel.Result"] = true
+            return resultMap
+        } else resultMap["Cancel.Result"] = false
+
+        if (result) {
+            if (resultMap["Chance.Result"] as? Boolean ?: true) {
+                player.sendLang("Extract-Success")
+
+                item.modifyLore {
+                    for ((index, element) in this.withIndex()) {
+                        if (element == gemConfig.slot) {
+                            set(index, gemConfig.display)
+                            addAll(index + 1, gemConfig.attribute)
+                            break
+                        }
+                    }
+                }
+
+                if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
+                if (!section.getBoolean("Return.Success.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
+                    .takeMoney(player, moneyAmount)
+                if (!section.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
+                    .takePoint(player, pointAmount)
+            } else {
+                player.sendLang("Extract-Fail")
+
+                if (!section.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
+                if (!section.getBoolean("Return.Fail.Slot", false)) inv.setItem(gemSlot, null)
+                if (!section.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
+                    .takeMoney(player, moneyAmount)
+                if (!section.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
+                    .takePoint(player, pointAmount)
+            }
+        } else {
+            if (!enableResult) player.sendLang("Extract-Disable")
+            if (!displayResult) player.sendLang("Extract-No-Display")
+            if (!tableResult) player.sendLang("Extract-Table-Not-Match")
             if (!ketherResult) player.sendLang("Error-Condition-Not-Met")
             if (!moneyResult) player.sendLang(
                 "Error-Money-Not-Enough",

@@ -88,6 +88,20 @@ object APICommand {
                     )
                 }
             }
+            // 是否满足拆卸条件
+            literal("isExtractConditionMet").dynamic("data").dynamic("table") {
+                execute<ProxyCommandSender> { sender, context, _ ->
+                    val player = sender.cast<Player>()
+                    sender.sendMessage(
+                        DefaultInventory.isExtractConditionMet(
+                            player,
+                            player.itemInHand,
+                            serviceAPI.gemConfigDataMap[context["data"]]!!,
+                            context["table"]
+                        ).toString()
+                    )
+                }
+            }
             // 重载
             literal("reload") {
                 execute<ProxyCommandSender> { _, _, _ ->
