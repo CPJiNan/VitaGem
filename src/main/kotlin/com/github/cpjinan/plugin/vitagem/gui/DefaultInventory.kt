@@ -301,8 +301,8 @@ object DefaultInventory {
      * Gem.Item ItemStack 放入槽位的宝石
      * Match.Result Boolean 物品是否有宝石槽位
      * Table.Result Boolean 宝石是否与界面匹配
-     * Chance.Result Boolean 镶嵌随机结果
-     * Chance.Amount Double 镶嵌成功概率
+     * Chance.Result Boolean 拆卸随机结果
+     * Chance.Amount Double 拆卸成功概率
      * Cancel.Result Boolean 事件是否取消
      *
      */
