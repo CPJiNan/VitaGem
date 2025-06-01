@@ -9,7 +9,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import taboolib.common5.util.replace
+import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XMaterial
+import taboolib.module.chat.colored
+import taboolib.module.nms.getName
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Chest
 import taboolib.platform.compat.replacePlaceholder
@@ -44,7 +47,11 @@ object DefaultInventory {
                 "Socket" -> {
                     hashMapOf(
                         "Socket.Symbol.Item" to tableSection.getString("Socket.Symbol.Item", "I")!!,
-                        "Socket.Symbol.Gem" to tableSection.getString("Socket.Symbol.Gem", "G")!!
+                        "Socket.Symbol.Gem" to tableSection.getString("Socket.Symbol.Gem", "G")!!,
+                        "Socket.Symbol.Preview" to tableSection.getString("Socket.Symbol.Preview", "S")!!,
+                        "Socket.Preview.Enable" to tableSection.getBoolean("Socket.Preview.Enable", true),
+                        "Socket.Preview.Lore" to tableSection.getStringList("Socket.Preview.Lore"),
+                        "Socket.Preview.Replace" to tableSection.getConfigurationSection("Socket.Preview.Replace")
                     )
                 }
 
@@ -79,8 +86,8 @@ object DefaultInventory {
                                     player,
                                     table,
                                     player.openInventory.topInventory,
-                                    getSlots(tableOptions["Socket.Symbol.Item"]!![0])[0],
-                                    getSlots(tableOptions["Socket.Symbol.Gem"]!![0])[0]
+                                    getSlots(tableOptions["Socket.Symbol.Item"].toString()[0])[0],
+                                    getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0])[0]
                                 )
                                 section.getStringList("Kether")
                                     .replace(
@@ -129,8 +136,8 @@ object DefaultInventory {
                 when (tableType) {
                     "Socket" -> {
                         mutableListOf<Int>().apply {
-                            addAll(getSlots(tableOptions["Socket.Symbol.Item"]!![0]))
-                            addAll(getSlots(tableOptions["Socket.Symbol.Gem"]!![0]))
+                            addAll(getSlots(tableOptions["Socket.Symbol.Item"].toString()[0]))
+                            addAll(getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0]))
                         }
                     }
 
@@ -146,8 +153,37 @@ object DefaultInventory {
             }
 
             when (tableType) {
+                "Socket" -> {
+                    onClick(tableOptions["Socket.Symbol.Item"].toString()[0]) {
+                        @Suppress("UNCHECKED_CAST")
+                        if (tableOptions["Socket.Preview.Enable"].toString().toBoolean()) refreshSocketPreview(
+                            player,
+                            table,
+                            player.openInventory.topInventory,
+                            getSlots(tableOptions["Socket.Symbol.Item"].toString()[0])[0],
+                            getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0])[0],
+                            getSlots(tableOptions["Socket.Symbol.Preview"].toString()[0])[0],
+                            tableOptions["Socket.Preview.Lore"] as List<String>,
+                            tableOptions["Socket.Preview.Replace"] as ConfigurationSection,
+                        )
+                    }
+                    onClick(tableOptions["Socket.Symbol.Gem"].toString()[0]) {
+                        @Suppress("UNCHECKED_CAST")
+                        if (tableOptions["Socket.Preview.Enable"].toString().toBoolean()) refreshSocketPreview(
+                            player,
+                            table,
+                            player.openInventory.topInventory,
+                            getSlots(tableOptions["Socket.Symbol.Item"].toString()[0])[0],
+                            getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0])[0],
+                            getSlots(tableOptions["Socket.Symbol.Preview"].toString()[0])[0],
+                            tableOptions["Socket.Preview.Lore"] as List<String>,
+                            tableOptions["Socket.Preview.Replace"] as ConfigurationSection,
+                        )
+                    }
+                }
+
                 "Extract" -> {
-                    onClick(tableOptions["Socket.Symbol.Gem"]!![0]) {
+                    onClick(tableOptions["Socket.Symbol.Gem"].toString()[0]) {
                         it.isCancelled = true
                     }
                 }
@@ -164,16 +200,19 @@ object DefaultInventory {
         gemSlot: Int
     ): Map<String, Any> {
         var resultMap = hashMapOf<String, Any>("Result" to false)
+
         val item = inv.getItem(itemSlot)
         if (item == null || item.isAir || item.type == Material.AIR) {
             player.sendLang("Socket-No-Item")
             return resultMap
         } else resultMap["Item"] = item
+
         val gemItem = inv.getItem(gemSlot)
         if (gemItem == null || gemItem.isAir || gemItem.type == Material.AIR) {
             player.sendLang("Socket-No-Gem")
             return resultMap
         } else resultMap["Gem"] = gemItem
+
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
 
@@ -259,5 +298,81 @@ object DefaultInventory {
         }
 
         return resultMap
+    }
+
+    /** 镶嵌预览 **/
+    fun refreshSocketPreview(
+        player: Player,
+        table: String,
+        inv: Inventory,
+        itemSlot: Int,
+        gemSlot: Int,
+        previewSlot: Int,
+        previewLore: List<String>,
+        replace: ConfigurationSection
+    ) {
+        var resultMap = hashMapOf<String, Any>("Result" to false)
+        val previewItem = inv.getItem(previewSlot)
+        var lore = previewLore
+
+        val item = inv.getItem(itemSlot)
+        if (item == null || item.isAir || item.type == Material.AIR) {
+            previewItem.modifyLore {
+                clear()
+            }
+            return
+        } else resultMap["Item"] = item.getName()
+
+        val gemItem = inv.getItem(gemSlot)
+        if (gemItem == null || gemItem.isAir || gemItem.type == Material.AIR) {
+            previewItem.modifyLore {
+                clear()
+            }
+            return
+        } else resultMap["Gem"] = gemItem.getName()
+
+        val serviceAPI = VitaGem.api().getService()
+
+        val gemConfigList = serviceAPI.getGem(gemItem).filter {
+            val gemTable = it.section.getString("Condition.Table", "")!!
+            gemTable.isEmpty() || table == gemTable
+        }
+        if (gemConfigList.isEmpty()) {
+            previewItem.modifyLore {
+                clear()
+            }
+            return
+        }
+        val gemConfig = gemConfigList[0]
+
+        resultMap = serviceAPI.isSocketConditionMet(player, item, gemConfig, table) as HashMap<String, Any>
+        val result = (resultMap["Result"] ?: "false").toString()
+        val itemResult = (resultMap["Item"] ?: "null").toString()
+        val gemResult = (resultMap["Gem"] ?: "null").toString()
+        val slotResult = gemConfig.slot
+        val moneyEnoughResult = (resultMap["Money.Enough"] ?: "true").toString().toBoolean()
+        val moneyAmountResult = (resultMap["Money.Amount"] ?: "0.0").toString().toDouble()
+        val pointEnoughResult = (resultMap["Point.Enough"] ?: "true").toString().toBoolean()
+        val pointAmountResult = (resultMap["Point.Amount"] ?: "0").toString().toInt()
+
+        lore = lore.replace(
+            "%Result%" to result,
+            "%Item%" to itemResult,
+            "%Gem%" to gemResult,
+            "%Slot%" to slotResult,
+            "%Money.Enough%" to moneyEnoughResult,
+            "%Money.Amount%" to moneyAmountResult,
+            "%Point.Enough%" to pointEnoughResult,
+            "%Point.Amount%" to pointAmountResult
+        ).replacePlaceholder(player).colored()
+
+        replace.getKeys(false).forEach {
+            lore = lore.replace(it to replace.get(it)!!)
+        }
+
+        previewItem.modifyLore {
+            clear()
+            addAll(lore)
+        }
     }
 }
