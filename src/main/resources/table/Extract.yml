@@ -29,16 +29,6 @@ Extract:
       Data: 5
       Name: '§8'
       Lore: [ ]
-    'I':
-      Type: 'GRAY_STAINED_GLASS_PANE'
-      Data: 8
-      Name: '§8'
-      Lore: [ ]
-    'G':
-      Type: 'GRAY_STAINED_GLASS_PANE'
-      Data: 8
-      Name: '§8'
-      Lore: [ ]
     'C':
       Type: 'BARRIER'
       Data: 0
