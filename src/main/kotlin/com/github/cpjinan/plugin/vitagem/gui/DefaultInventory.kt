@@ -468,7 +468,7 @@ object DefaultInventory {
                 extractGem()
                 player.sendLang("Extract-Success")
                 if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
-                if (hookAPI.getItemTools().isPluginEnabled() && section.getBoolean("Return.Success.Gem", false)) {
+                if (hookAPI.getItemTools().isPluginEnabled() && section.getBoolean("Return.Success.Gem", true)) {
                     hookAPI.getItemTools().giveItem(player, section.getString("Item", "")!!)
                 }
                 if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
