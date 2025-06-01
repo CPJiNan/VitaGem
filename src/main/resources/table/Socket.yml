@@ -31,8 +31,8 @@ Socket:
         - "&6◆ &f满足镶嵌条件: &a%Result%"
         - ""
       Replace:
-        "true": "&a✓"
-        "false": "&c✗"
+        "true": "§a✓"
+        "false": "§c✗"
         "null": "未知"
   # 图标
   Icon:
