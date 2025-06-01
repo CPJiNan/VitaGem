@@ -86,8 +86,7 @@ object DefaultInventory {
                                     .replace(
                                         "%Result%" to (result["Result"] ?: "false"),
                                         "%Enable%" to (result["Enable"] ?: "true"),
-                                        "%Item%" to (result["Item"] ?: "true"),
-                                        "%Gem%" to (result["Gem"] ?: "true"),
+                                        "%Cancel%" to (result["Cancel"] ?: "false"),
                                         "%Match%" to (result["Match"] ?: "true"),
                                         "%Slot%" to (result["Slot"] ?: "true"),
                                         "%Table%" to (result["Table"] ?: "true"),
