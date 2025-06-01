@@ -144,6 +144,14 @@ object DefaultInventory {
                     }
                 }
             }
+
+            when (tableType) {
+                "Extract" -> {
+                    onClick(tableOptions["Socket.Symbol.Gem"]!![0]) {
+                        it.isCancelled = true
+                    }
+                }
+            }
         }
     }
 
@@ -162,7 +170,7 @@ object DefaultInventory {
             return resultMap
         } else resultMap["Item"] = item
         val gemItem = inv.getItem(gemSlot)
-        if (gemItem == null || item.isAir || item.type == Material.AIR) {
+        if (gemItem == null || gemItem.isAir || gemItem.type == Material.AIR) {
             player.sendLang("Socket-No-Gem")
             return resultMap
         } else resultMap["Gem"] = gemItem
