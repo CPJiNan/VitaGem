@@ -54,7 +54,7 @@ Example:
     # 成功率
     Chance: "0.3"
     # 宝石物品 (ItemTools)
-    Item: ""
+    Item: "一阶生命宝石"
     # 条件
     Condition:
       # 限制拆卸界面 (留空则不指定界面)
