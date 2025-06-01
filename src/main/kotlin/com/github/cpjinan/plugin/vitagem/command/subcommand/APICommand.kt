@@ -3,6 +3,7 @@
 package com.github.cpjinan.plugin.vitagem.command.subcommand
 
 import com.github.cpjinan.plugin.vitagem.VitaGem
+import com.github.cpjinan.plugin.vitagem.gui.DefaultInventory
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.ProxyCommandSender
@@ -78,21 +79,7 @@ object APICommand {
                 execute<ProxyCommandSender> { sender, context, _ ->
                     val player = sender.cast<Player>()
                     sender.sendMessage(
-                        serviceAPI.isSocketConditionMet(
-                            player,
-                            player.itemInHand,
-                            serviceAPI.gemConfigDataMap[context["data"]]!!,
-                            context["table"]
-                        ).toString()
-                    )
-                }
-            }
-            // 是否满足拆卸条件
-            literal("isExtractConditionMet").dynamic("data").dynamic("table") {
-                execute<ProxyCommandSender> { sender, context, _ ->
-                    val player = sender.cast<Player>()
-                    sender.sendMessage(
-                        serviceAPI.isExtractConditionMet(
+                        DefaultInventory.isSocketConditionMet(
                             player,
                             player.itemInHand,
                             serviceAPI.gemConfigDataMap[context["data"]]!!,
