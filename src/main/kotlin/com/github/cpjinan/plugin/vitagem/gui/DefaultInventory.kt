@@ -154,19 +154,6 @@ object DefaultInventory {
 
             when (tableType) {
                 "Socket" -> {
-                    onClick(tableOptions["Socket.Symbol.Item"].toString()[0]) {
-                        @Suppress("UNCHECKED_CAST")
-                        if (tableOptions["Socket.Preview.Enable"].toString().toBoolean()) refreshSocketPreview(
-                            player,
-                            table,
-                            player.openInventory.topInventory,
-                            getSlots(tableOptions["Socket.Symbol.Item"].toString()[0])[0],
-                            getSlots(tableOptions["Socket.Symbol.Gem"].toString()[0])[0],
-                            getSlots(tableOptions["Socket.Symbol.Preview"].toString()[0])[0],
-                            tableOptions["Socket.Preview.Lore"] as List<String>,
-                            tableOptions["Socket.Preview.Replace"] as ConfigurationSection,
-                        )
-                    }
                     onClick(tableOptions["Socket.Symbol.Gem"].toString()[0]) {
                         @Suppress("UNCHECKED_CAST")
                         if (tableOptions["Socket.Preview.Enable"].toString().toBoolean()) refreshSocketPreview(
