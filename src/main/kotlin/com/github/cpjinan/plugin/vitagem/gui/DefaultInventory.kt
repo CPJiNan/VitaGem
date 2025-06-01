@@ -135,6 +135,12 @@ object DefaultInventory {
                         }
                     }
 
+                    "Extract" -> {
+                        mutableListOf<Int>().apply {
+                            addAll(getSlots((tableOptions["Slot.Item"] as String)[0]))
+                        }
+                    }
+
                     else -> mutableListOf()
                 }.forEach { slot ->
                     val item = event.inventory.getItem(slot)
