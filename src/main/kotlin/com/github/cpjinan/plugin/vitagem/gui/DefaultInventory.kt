@@ -90,11 +90,11 @@ object DefaultInventory {
                     }
 
                     // 刷新宝石列表按钮
-                    "Refresh-Extract", "VitaGem:Refresh-Extract" -> {
+                    "Refresh", "VitaGem:Refresh" -> {
                         set(icon[0], item) {
                             clickEvent().isCancelled = true
                             clickEvent().run {
-                                refreshExtractButton(
+                                refreshButton(
                                     table,
                                     player.openInventory.topInventory,
                                     getSlots((tableOptions["Slot.Item"] as String)[0])[0],
@@ -470,7 +470,7 @@ object DefaultInventory {
     }
 
     /** 刷新宝石列表按钮 **/
-    fun refreshExtractButton(
+    fun refreshButton(
         table: String,
         inv: Inventory,
         itemSlot: Int,

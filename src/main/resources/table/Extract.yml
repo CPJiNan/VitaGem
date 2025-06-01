@@ -29,7 +29,7 @@ Extract:
       Data: 5
       Name: '§a刷新宝石列表'
       Lore: [ ]
-      Bind: "Refresh-Extract"
+      Bind: "Refresh"
     'C':
       Type: 'BARRIER'
       Data: 0
