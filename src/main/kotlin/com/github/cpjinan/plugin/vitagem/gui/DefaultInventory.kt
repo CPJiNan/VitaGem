@@ -50,6 +50,13 @@ object DefaultInventory {
                     )
                 }
 
+                "Extract" -> {
+                    hashMapOf(
+                        "Slot.Item" to tableSection.getString("Slot.Item", "I")!!,
+                        "Slot.Gem" to tableSection.getString("Slot.Gem", "G")!!
+                    )
+                }
+
                 else -> hashMapOf()
             }
 
@@ -78,6 +85,21 @@ object DefaultInventory {
                                     getSlots((tableOptions["Slot.Gem"] as String)[0])[0]
                                 )
                                 section.getStringList("Kether").evalKether(player)
+                            }
+                        }
+                    }
+
+                    // 刷新宝石列表按钮
+                    "Refresh-Extract", "VitaGem:Refresh-Extract" -> {
+                        set(icon[0], item) {
+                            clickEvent().isCancelled = true
+                            clickEvent().run {
+                                refreshExtractButton(
+                                    table,
+                                    player.openInventory.topInventory,
+                                    getSlots((tableOptions["Slot.Item"] as String)[0])[0],
+                                    getSlots((tableOptions["Slot.Gem"] as String)[0])
+                                )
                             }
                         }
                     }
@@ -445,6 +467,35 @@ object DefaultInventory {
         }
 
         return resultMap
+    }
+
+    /** 刷新宝石列表按钮 **/
+    fun refreshExtractButton(
+        table: String,
+        inv: Inventory,
+        itemSlot: Int,
+        gemSlot: List<Int>
+    ) {
+        val item = inv.getItem(itemSlot)
+        if (item == null || item.isAir || item.type == Material.AIR) return
+
+        val serviceAPI = VitaGem.api().getService()
+        val hookAPI = VitaGem.api().getHook()
+
+        val gemItemList = serviceAPI.gemConfigDataMap.filterValues {
+            it.display in serviceAPI.getSlot(item).map { gemData -> gemData.key.display }
+        }.filterValues {
+            val gemTable = it.section.getString("Condition.Table", "")!!
+            gemTable.isEmpty() || table == gemTable
+        }.mapNotNull {
+            if (hookAPI.getItemTools().isPluginEnabled()) hookAPI.getItemTools()
+                .getItem(it.value.extractSection.getString("Item", "")!!)
+            else null
+        }.distinct().toMutableList()
+
+        gemSlot.forEach {
+            if (gemItemList.isNotEmpty()) inv.setItem(it, gemItemList.removeFirstOrNull())
+        }
     }
 
     /** 是否满足镶嵌条件 **/

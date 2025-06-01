@@ -27,8 +27,9 @@ Extract:
     '@':
       Type: 'GRAY_STAINED_GLASS_PANE'
       Data: 5
-      Name: '§8'
+      Name: '§a刷新宝石列表'
       Lore: [ ]
+      Bind: "Refresh-Extract"
     'C':
       Type: 'BARRIER'
       Data: 0
