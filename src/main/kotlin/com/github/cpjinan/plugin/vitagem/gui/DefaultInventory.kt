@@ -1,6 +1,7 @@
 package com.github.cpjinan.plugin.vitagem.gui
 
 import com.github.cpjinan.plugin.vitagem.VitaGem
+import com.github.cpjinan.plugin.vitagem.event.PlayerSocketEvent
 import com.github.cpjinan.plugin.vitagem.utils.KetherUtils.evalKether
 import com.github.cpjinan.plugin.vitagem.utils.RandomUtils
 import org.bukkit.Material
@@ -158,16 +159,14 @@ object DefaultInventory {
         var resultMap = hashMapOf<String, Any>("Result" to false)
         val item = inv.getItem(itemSlot)
         if (item == null || item.isAir || item.type == Material.AIR) {
-            resultMap["Item"] = false
             player.sendLang("Socket-No-Item")
             return resultMap
-        }
+        } else resultMap["Item"] = item
         val gemItem = inv.getItem(gemSlot)
         if (gemItem == null || item.isAir || item.type == Material.AIR) {
-            resultMap["Gem"] = false
             player.sendLang("Socket-No-Gem")
             return resultMap
-        }
+        } else resultMap["Gem"] = gemItem
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
 
@@ -194,12 +193,19 @@ object DefaultInventory {
         val pointEnoughResult = (resultMap["Point.Enough"] ?: "true").toString().toBoolean()
         val pointAmountResult = (resultMap["Point.Amount"] ?: "0").toString().toInt()
 
-        if (result) {
-            val chance = Arim.fixedCalculator.evaluate(section.getString("Chance", "1.0")!!.replacePlaceholder(player))
-            if (RandomUtils.randomBoolean(chance)) {
-                resultMap["Chance.Result"] = true
-                resultMap["Chance.Amount"] = chance
+        resultMap["Chance.Amount"] =
+            Arim.fixedCalculator.evaluate(section.getString("Chance", "1.0")!!.replacePlaceholder(player))
+        resultMap["Chance.Result"] = RandomUtils.randomBoolean(resultMap["Chance.Amount"].toString().toDouble())
 
+        val event = PlayerSocketEvent(player, resultMap)
+        event.call()
+        if (event.isCancelled) {
+            resultMap["Cancel"] = true
+            return resultMap
+        }
+
+        if (result) {
+            if (resultMap["Chance.Result"].toString().toBoolean()) {
                 player.sendLang("Socket-Success")
 
                 item.modifyLore {
@@ -219,9 +225,6 @@ object DefaultInventory {
                 if (!gemConfig.socketSection.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
                     .takePoint(player, pointAmountResult)
             } else {
-                resultMap["Chance.Result"] = false
-                resultMap["Chance.Amount"] = chance
-
                 player.sendLang("Socket-Fail")
 
                 if (!gemConfig.socketSection.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
