@@ -162,9 +162,6 @@ object DefaultInventory {
                         val item = inv.getItem(itemSlot)
                         if (item != null && !item.isAir && item.type != Material.AIR) return@onClick
 
-                        val currentItem = it.clickEvent().currentItem
-                        if (currentItem != null && !currentItem.isAir && currentItem.type != Material.AIR) return@onClick
-
                         extractButton(player, table, inv, itemSlot, it.rawSlot)
                         refreshButton(table, inv, itemSlot, getSlots((tableOptions["Slot.Gem"] as String)[0]))
                     }
