@@ -157,13 +157,13 @@ object DefaultInventory {
                     onClick((tableOptions["Slot.Gem"] as String)[0]) {
                         it.isCancelled = true
 
-                        val cursor = it.clickEvent().cursor
-                        if (cursor != null && !cursor.isAir && cursor.type != Material.AIR) return@onClick
-
                         val inv = player.openInventory.topInventory
                         val itemSlot = getSlots((tableOptions["Slot.Item"] as String)[0])[0]
                         val item = inv.getItem(itemSlot)
                         if (item != null && !item.isAir && item.type != Material.AIR) return@onClick
+
+                        val currentItem = it.currentItem
+                        if (currentItem != null && !currentItem.isAir && currentItem.type != Material.AIR) return@onClick
 
                         extractButton(player, table, inv, itemSlot, it.rawSlot)
                         refreshButton(table, inv, itemSlot, getSlots((tableOptions["Slot.Gem"] as String)[0]))
