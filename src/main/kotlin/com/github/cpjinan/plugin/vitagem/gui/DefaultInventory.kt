@@ -189,6 +189,7 @@ object DefaultInventory {
      * Enable.Result Boolean 镶嵌是否启用
      * Slot.Name String 镶嵌槽位名称
      * Slot.Result Boolean 物品有无镶嵌槽位
+     * Display.Name String 宝石槽位名称
      * Table.Name String 限制界面名称
      * Table.Result Boolean 界面是否匹配
      * Kether.Result Boolean 脚本条件是否满足
@@ -198,9 +199,11 @@ object DefaultInventory {
      * Point.Amount Double 消耗点券数量
      *
      * Item.Result Boolean 物品是否放入槽位
-     * Item.Item ItemStack 放入槽位的物品
+     * Item.ItemStack ItemStack 放入槽位的物品
+     * Item.ItemStack.Amount Int 物品数量
      * Gem.Result Boolean 宝石是否放入槽位
-     * Gem.Item ItemStack 放入槽位的宝石
+     * Gem.ItemStack ItemStack 放入槽位的宝石
+     * Gem.ItemStack.Amount Int 宝石数量
      * Match.Result Boolean 物品是否有宝石槽位
      * Table.Result Boolean 宝石是否与界面匹配
      * Chance.Result Boolean 镶嵌随机结果
@@ -224,7 +227,13 @@ object DefaultInventory {
             return resultMap
         } else {
             resultMap["Item.Result"] = true
-            resultMap["Item.Item"] = item
+            resultMap["Item.ItemStack"] = item
+        }
+
+        resultMap["Item.ItemStack.Amount"] = item.amount
+        if (item.amount != 1) {
+            player.sendLang("Socket-Not-Single-Item")
+            return resultMap
         }
 
         val gemItem = inv.getItem(gemSlot)
@@ -234,7 +243,13 @@ object DefaultInventory {
             return resultMap
         } else {
             resultMap["Gem.Result"] = true
-            resultMap["Gem.Item"] = gemItem
+            resultMap["Gem.ItemStack"] = gemItem
+        }
+
+        resultMap["Gem.ItemStack.Amount"] = gemItem.amount
+        if (gemItem.amount != 1) {
+            player.sendLang("Socket-Not-Single-Gem")
+            return resultMap
         }
 
         val serviceAPI = VitaGem.api().getService()
@@ -340,6 +355,7 @@ object DefaultInventory {
      *
      * Data GemConfigData 宝石配置数据
      * Enable.Result Boolean 镶嵌是否启用
+     * Slot.Name String 镶嵌槽位名称
      * Display.Name String 宝石槽位名称
      * Display.Result Boolean 物品有无宝石槽位
      * Table.Name String 限制界面名称
@@ -351,9 +367,10 @@ object DefaultInventory {
      * Point.Amount Double 消耗点券数量
      *
      * Item.Result Boolean 物品是否放入槽位
-     * Item.Item ItemStack 放入槽位的物品
+     * Item.ItemStack ItemStack 放入槽位的物品
+     * Item.ItemStack.Amount Int 物品数量
      * Gem.Result Boolean 宝石是否放入槽位
-     * Gem.Item ItemStack 放入槽位的宝石
+     * Gem.ItemStack ItemStack 放入槽位的宝石
      * Match.Result Boolean 物品是否有宝石槽位
      * Table.Result Boolean 宝石是否与界面匹配
      * Chance.Result Boolean 拆卸随机结果
@@ -377,7 +394,13 @@ object DefaultInventory {
             return resultMap
         } else {
             resultMap["Item.Result"] = true
-            resultMap["Item.Item"] = item
+            resultMap["Item.ItemStack"] = item
+        }
+
+        resultMap["Item.ItemStack.Amount"] = item.amount
+        if (item.amount != 1) {
+            player.sendLang("Extract-Not-Single-Item")
+            return resultMap
         }
 
         val gemItem = inv.getItem(gemSlot)
@@ -386,7 +409,7 @@ object DefaultInventory {
             return resultMap
         } else {
             resultMap["Gem.Result"] = true
-            resultMap["Gem.Item"] = gemItem
+            resultMap["Gem.ItemStack"] = gemItem
         }
 
         val serviceAPI = VitaGem.api().getService()
@@ -570,6 +593,7 @@ object DefaultInventory {
         } else result["Enable.Result"] = true
 
         result["Slot.Name"] = data.slot
+        result["Display.Name"] = data.display
         if (serviceAPI.getSlot(item, data) == 0) {
             result["Result"] = false
             result["Slot.Result"] = false
@@ -633,6 +657,7 @@ object DefaultInventory {
             return result
         } else result["Enable.Result"] = true
 
+        result["Slot.Name"] = data.slot
         result["Display.Name"] = data.display
         if (serviceAPI.getDisplay(item, data) == 0) {
             result["Result"] = false
