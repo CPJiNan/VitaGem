@@ -533,7 +533,10 @@ object DefaultInventory {
         gemSlot: List<Int>
     ) {
         val item = inv.getItem(itemSlot)
-        if (item == null || item.isAir || item.type == Material.AIR) return
+        if (item == null || item.isAir || item.type == Material.AIR) {
+            gemSlot.forEach { inv.setItem(it, null) }
+            return
+        }
 
         val serviceAPI = VitaGem.api().getService()
         val hookAPI = VitaGem.api().getHook()
