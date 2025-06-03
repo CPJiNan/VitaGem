@@ -307,27 +307,19 @@ object DefaultInventory {
 
                 if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
                 if (!section.getBoolean("Return.Success.Gem", false)) inv.setItem(gemSlot, null)
-                if (hookAPI.getVault().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
-                        .takeMoney(player, moneyAmount)
-                }
-                if (hookAPI.getPlayerPoints().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
-                        .takePoint(player, pointAmount)
-                }
+                if (hookAPI.getVault().isPluginEnabled() && !section.getBoolean("Return.Success.Money", false))
+                    hookAPI.getVault().takeMoney(player, moneyAmount)
+                if (hookAPI.getPlayerPoints().isPluginEnabled() && !section.getBoolean("Return.Success.Point", false))
+                    hookAPI.getPlayerPoints().takePoint(player, pointAmount)
             } else {
                 player.sendLang("Socket-Fail")
 
                 if (!section.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
                 if (!section.getBoolean("Return.Fail.Gem", false)) inv.setItem(gemSlot, null)
-                if (hookAPI.getVault().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
-                        .takeMoney(player, moneyAmount)
-                }
-                if (hookAPI.getPlayerPoints().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
-                        .takePoint(player, pointAmount)
-                }
+                if (hookAPI.getVault().isPluginEnabled() && !section.getBoolean("Return.Fail.Money", false))
+                    hookAPI.getVault().takeMoney(player, moneyAmount)
+                if (hookAPI.getPlayerPoints().isPluginEnabled() && !section.getBoolean("Return.Fail.Point", false))
+                    hookAPI.getPlayerPoints().takePoint(player, pointAmount)
             }
         } else {
             if (!enableResult) player.sendLang("Socket-Disable")
@@ -489,30 +481,21 @@ object DefaultInventory {
                 extractGem()
                 player.sendLang("Extract-Success")
                 if (!section.getBoolean("Return.Success.Item", true)) inv.setItem(itemSlot, null)
-                if (hookAPI.getItemTools().isPluginEnabled()) {
-                    if (section.getBoolean("Return.Success.Gem", true)) hookAPI.getItemTools()
-                        .giveItem(player, section.getString("Item", "")!!)
+                if (hookAPI.getItemTools().isPluginEnabled() && section.getBoolean("Return.Success.Gem", true)) {
+                    hookAPI.getItemTools().giveItem(player, section.getString("Item", "")!!)
                 }
-                if (hookAPI.getVault().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Success.Money", false)) hookAPI.getVault()
-                        .takeMoney(player, moneyAmount)
-                }
-                if (hookAPI.getPlayerPoints().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Success.Point", false)) hookAPI.getPlayerPoints()
-                        .takePoint(player, pointAmount)
-                }
+                if (hookAPI.getVault().isPluginEnabled() && !section.getBoolean("Return.Success.Money", false))
+                    hookAPI.getVault().takeMoney(player, moneyAmount)
+                if (hookAPI.getPlayerPoints().isPluginEnabled() && !section.getBoolean("Return.Success.Point", false))
+                    hookAPI.getPlayerPoints().takePoint(player, pointAmount)
             } else {
                 player.sendLang("Extract-Fail")
                 if (!section.getBoolean("Return.Fail.Item", true)) inv.setItem(itemSlot, null)
                 if (!section.getBoolean("Return.Fail.Gem", false)) extractGem()
-                if (hookAPI.getVault().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Fail.Money", false)) hookAPI.getVault()
-                        .takeMoney(player, moneyAmount)
-                }
-                if (hookAPI.getPlayerPoints().isPluginEnabled()) {
-                    if (!section.getBoolean("Return.Fail.Point", false)) hookAPI.getPlayerPoints()
-                        .takePoint(player, pointAmount)
-                }
+                if (hookAPI.getVault().isPluginEnabled() && !section.getBoolean("Return.Fail.Money", false))
+                    hookAPI.getVault().takeMoney(player, moneyAmount)
+                if (hookAPI.getPlayerPoints().isPluginEnabled() && !section.getBoolean("Return.Fail.Point", false))
+                    hookAPI.getPlayerPoints().takePoint(player, pointAmount)
             }
         } else {
             if (!enableResult) player.sendLang("Extract-Disable")
@@ -631,20 +614,20 @@ object DefaultInventory {
 
         val money = section.getDouble("Money", 0.0)
         result["Money.Amount"] = money
-        if (hookAPI.getVault().isPluginEnabled()) {
-            if (!hookAPI.getVault().isMoneyEnough(player, money)) {
-                result["Result"] = false
-                result["Money.Result"] = false
-            } else result["Money.Result"] = true
+        if (hookAPI.getVault().isPluginEnabled() &&
+            !hookAPI.getVault().isMoneyEnough(player, money)
+        ) {
+            result["Result"] = false
+            result["Money.Result"] = false
         } else result["Money.Result"] = true
 
         val point = section.getInt("Point", 0)
         result["Point.Amount"] = point
-        if (hookAPI.getPlayerPoints().isPluginEnabled()) {
-            if (!hookAPI.getPlayerPoints().isPointEnough(player, point)) {
-                result["Result"] = false
-                result["Point.Result"] = false
-            } else result["Point.Result"] = true
+        if (hookAPI.getPlayerPoints().isPluginEnabled() &&
+            !hookAPI.getPlayerPoints().isPointEnough(player, point)
+        ) {
+            result["Result"] = false
+            result["Point.Result"] = false
         } else result["Point.Result"] = true
 
         return result
@@ -696,20 +679,20 @@ object DefaultInventory {
 
         val money = section.getDouble("Money", 0.0)
         result["Money.Amount"] = money
-        if (hookAPI.getVault().isPluginEnabled()) {
-            if (!hookAPI.getVault().isMoneyEnough(player, money)) {
-                result["Result"] = false
-                result["Money.Result"] = false
-            } else result["Money.Result"] = true
+        if (hookAPI.getVault().isPluginEnabled() &&
+            !hookAPI.getVault().isMoneyEnough(player, money)
+        ) {
+            result["Result"] = false
+            result["Money.Result"] = false
         } else result["Money.Result"] = true
 
         val point = section.getInt("Point", 0)
         result["Point.Amount"] = point
-        if (hookAPI.getPlayerPoints().isPluginEnabled()) {
-            if (!hookAPI.getPlayerPoints().isPointEnough(player, point)) {
-                result["Result"] = false
-                result["Point.Result"] = false
-            } else result["Point.Result"] = true
+        if (hookAPI.getPlayerPoints().isPluginEnabled() &&
+            !hookAPI.getPlayerPoints().isPointEnough(player, point)
+        ) {
+            result["Result"] = false
+            result["Point.Result"] = false
         } else result["Point.Result"] = true
 
         return result
