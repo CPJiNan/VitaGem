@@ -8,8 +8,8 @@ import com.github.cpjinan.plugin.vitagem.utils.LoggerUtils.debug
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.*
 import taboolib.common.util.isConsole
-import taboolib.expansion.createHelper
 import taboolib.module.lang.sendLang
+import top.maplex.arim.tools.commandhelper.createTabooLegacyStyleCommandHelper
 
 /**
  * VitaGem
@@ -27,7 +27,7 @@ import taboolib.module.lang.sendLang
 object MainCommand {
     @CommandBody
     val main = mainCommand {
-        createHelper()
+        createTabooLegacyStyleCommandHelper()
     }
 
     @CommandBody(
