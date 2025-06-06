@@ -343,7 +343,7 @@ object DefaultInventory {
 
     /** 拆卸按钮
      *
-     * Result Boolean 镶嵌是否成功
+     * Result Boolean 拆卸是否成功
      *
      * Data GemConfigData 宝石配置数据
      * Enable.Result Boolean 镶嵌是否启用
