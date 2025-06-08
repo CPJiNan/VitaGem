@@ -64,7 +64,7 @@ object MainCommand {
         permissionDefault = PermissionDefault.OP
     )
     val reload = subCommand {
-        execute { sender: ProxyCommandSender, _: CommandContext<ProxyCommandSender>, _: String ->
+        execute<ProxyCommandSender> { sender, _, _ ->
             debug("&8[&3Vita&bGem&8] &5调试&7#1 &8| &6触发插件重载命令，正在展示处理逻辑。")
 
             PluginReloadEvent.Pre().call()
